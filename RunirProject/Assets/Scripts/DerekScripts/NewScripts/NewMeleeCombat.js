@@ -47,7 +47,7 @@ class NewMeleeCombat extends MonoBehaviour{
 					event.fired = false;
 				}
 				
-				if(!attacking && Time.time > (lastClick + 0.33)){
+				if(!anim.GetBool("busy") && Time.time > (lastClick + 0.33)){
 					
 					if(Time.time > (lastAttackEnded + comboTime)) comboCounter = 0;
 					
@@ -55,13 +55,15 @@ class NewMeleeCombat extends MonoBehaviour{
 					
 					anim.CrossFade(nextAttackState, 0.1, animLayer);
 					
-					attacking = true;
+					anim.SetBool("busy", true);
 					
 					comboCounter++;
 					if(comboCounter == 3) comboCounter = 0;
 					
 				}
+				
 				lastClick = Time.time;
+				
 			}
 			
 			
@@ -80,15 +82,17 @@ class NewMeleeCombat extends MonoBehaviour{
 		var fired : boolean = false;	
 	}
 	
-	var attacking : boolean = false;
-	
+	function MeleeStart(){
+		BroadcastMessage("StartWeaponTrail");
+	}
+		
 	function MeleeApex(){
 	
 	}
 	
 	function MeleeStop(){
 		BroadcastMessage("StopWeaponTrail");
-		attacking = false;
+		anim.SetBool("busy", false);
 		lastAttackEnded = Time.time;
 	}
 
