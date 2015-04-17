@@ -100,6 +100,14 @@ public class MeleeWeaponTrail : MonoBehaviour
 		Destroy(_trailObject);
 	}
 
+	void StartWeaponTrail(){
+		_emit = true;
+	}
+
+	void StopWeaponTrail(){
+		_emit = false;
+	}
+
 	void Update()
 	{
 		if (!_use)

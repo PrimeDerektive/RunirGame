@@ -66,6 +66,12 @@ private var initialized : boolean = false;
 function LateUpdate () {
 
     if (target && initialized) {
+    
+    	var anim = target.GetComponent.<Animator>();
+    	var currentState = anim.GetCurrentAnimatorStateInfo(2);
+    	if(currentState.IsName("Attack1")) xSpeed = 30;
+    	else xSpeed = 90;
+    	
         
         //calculate angle between cam and player forward
         //var angleDifference = Utilities.FindTurningAngle(target.forward, transform.forward);

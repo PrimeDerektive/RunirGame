@@ -1,32 +1,29 @@
 ﻿#pragma strict
+import UnityEngine.Events;
 
 class NewMeleeCombat extends MonoBehaviour{
 
 	var animLayer : int;
-	var animState : String;
-	var animState1 : String;
-	var animState2 : String;
+	var animStates : String[];
 	
-	var comboCounter : int = 0;	
+	
+	var comboCounter : int = 0;
+	private var comboTime : float = 1.0;	
 	
 	var inputDownEvents : InputDownEvent[];
 
-	private var anim : Animator;
-	private var inputDownLength : float = 0.0;
+	private var inputDownLength : float = 0.0;	
+	private var lastClick : float = 0.0;
+	private var lastAttackEnded : float = 0.0;
 	
-	@HideInInspector
-	var flag : boolean;
-	@HideInInspector
-	var i : int = 1;
+	private var anim : Animator;
 
 	function Start(){
 		anim = GetComponent.<Animator>();
 	}
-	
-	private var lastClick : float = 0.0;
 
 	function Update () {
-		if(animLayer && animState && anim){
+		if(animLayer && (animStates.Length > 0) && anim){
 		
 			var currentState = anim.GetCurrentAnimatorStateInfo(animLayer);
 			var nextState = anim.GetNextAnimatorStateInfo(animLayer);
@@ -42,19 +39,19 @@ class NewMeleeCombat extends MonoBehaviour{
 				}
 			}
 			
-			Debug.Log(currentState.normalizedTime);
 			if(Input.GetButtonUp("Fire1")){ //if the fire key is released
-				if(!attacking){
+				
+				inputDownLength = 0.0; //reset down timer 
+				//reset event triggers
+				for(var event : InputDownEvent in inputDownEvents){
+					event.fired = false;
+				}
+				
+				if(!attacking && Time.time > (lastClick + 0.33)){
 					
-					inputDownLength = 0.0; //reset down timer 
-					//reset event triggers
-					for(var event : InputDownEvent in inputDownEvents){
-						event.fired = false;
-					}
+					if(Time.time > (lastAttackEnded + comboTime)) comboCounter = 0;
 					
-					var nextAttackState = animState;
-					if(comboCounter == 1) nextAttackState = animState1;
-					if(comboCounter == 2) nextAttackState = animState2;				
+					var nextAttackState = animStates[comboCounter];	
 					
 					anim.CrossFade(nextAttackState, 0.1, animLayer);
 					
@@ -64,8 +61,10 @@ class NewMeleeCombat extends MonoBehaviour{
 					if(comboCounter == 3) comboCounter = 0;
 					
 				}
-				//lastClick = Time.time;
+				lastClick = Time.time;
 			}
+			
+			
 		
 		}
 	}
@@ -81,23 +80,27 @@ class NewMeleeCombat extends MonoBehaviour{
 		var fired : boolean = false;	
 	}
 	
-	private var attacking : boolean = false;
-	
-	function MeleeStart(){
-		
-	}
+	var attacking : boolean = false;
 	
 	function MeleeApex(){
 	
 	}
 	
 	function MeleeStop(){
+		BroadcastMessage("StopWeaponTrail");
 		attacking = false;
+		lastAttackEnded = Time.time;
 	}
 
 }
 
 /*
+	
+@HideInInspector
+var flag : boolean;
+@HideInInspector
+var i : int = 1;
+
 @CustomEditor(NewMeleeCombat)
 class NewMeleeCombatEditor extends Editor{
 	function OnInspectorGUI(){
