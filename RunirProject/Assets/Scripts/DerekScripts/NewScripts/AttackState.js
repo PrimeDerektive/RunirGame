@@ -20,7 +20,7 @@ public class AttackState extends StateMachineBehaviour{
     
 }
 
-class AnimEvent{
+public class AnimEvent{
 	var name : String;
 	@Range(0.0,1.0)
 	var time : float;
