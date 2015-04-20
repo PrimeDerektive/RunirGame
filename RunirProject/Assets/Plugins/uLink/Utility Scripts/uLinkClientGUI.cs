@@ -374,8 +374,8 @@ public class uLinkClientGUI : uLink.MonoBehaviour
 
 	void EnableGUI(bool enabled)
 	{
-		if (lockCursor) Screen.lockCursor = !enabled;
-		if (hideCursor) Cursor.visible = enabled;
+		if (lockCursor) Cursor.lockState = CursorLockMode.Locked;
+		if (hideCursor) Cursor.lockState = CursorLockMode.None;
 
 		foreach (UnityEngine.MonoBehaviour component in enableWhenGUI)
 		{

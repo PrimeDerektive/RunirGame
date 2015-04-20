@@ -20,7 +20,7 @@ using uLink;
 /// rigidbody component like this: 
 /// Drag = 0
 /// Use Gravity = false (should be true on the server, the creator prefab, if you are using gravity in the game)
-/// Is Kinematic = false (must be set in proxy and owner - because this script does set rigidbody.velocity directly to move the object in the client)
+/// Is Kinematic = false (must be set in proxy and owner - because this script does set GetComponent<Rigidbody>().velocity directly to move the object in the client)
 /// Interpolate = Interpolate (required) - Default value is None, so make sure you do change this value. 
 ///
 /// How it works: The basic idea for this script is that the creator object moves in the server by some logic 
@@ -40,7 +40,7 @@ using uLink;
 /// using RPCs. The creator object in the server recieves this. The creator object will move due to the client input and other
 /// forces like objects colliding. The resulting position and rotation is send from the server to all clients using state sync.
 /// This script does state sync sending. The clients receives the state sync (done by this script) and calcualtes a smooth 
-/// new velocity for the client side object and applices this velocity to the rigidbody.
+/// new velocity for the client side object and applices this velocity to the GetComponent<Rigidbody>().
 /// 
 /// There is an example project using this script among the list of uLink example projects: 
 /// http://developer.unitypark3d.com/examples/
