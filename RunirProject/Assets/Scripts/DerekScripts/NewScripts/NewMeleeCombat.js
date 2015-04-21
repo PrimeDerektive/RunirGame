@@ -55,7 +55,7 @@ class NewMeleeCombat extends MonoBehaviour{
 					
 					anim.CrossFade(nextAttackState, 0.1, animLayer);
 					
-					anim.SetBool("busy", true);
+					//anim.SetBool("busy", true);
 					
 					comboCounter++;
 					if(comboCounter == 3) comboCounter = 0;
@@ -92,7 +92,7 @@ class NewMeleeCombat extends MonoBehaviour{
 	
 	function MeleeStop(){
 		BroadcastMessage("StopWeaponTrail");
-		anim.SetBool("busy", false);
+		//anim.SetBool("busy", false);
 		lastAttackEnded = Time.time;
 	}
 

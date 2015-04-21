@@ -17,16 +17,12 @@ function Start () {
 	anim = GetComponent.<Animator>();
 }
 
-
-
 function Update(){
-
 	//calculate and set turnSpeed in animator
 	lastForward.y = transform.forward.y;
 	var turnSpeed = Vector3.Angle(transform.forward, lastForward)/Time.deltaTime;
 	anim.SetFloat("turnSpeed", turnSpeed);
-	lastForward = transform.forward;
-		
+	lastForward = transform.forward;	
 }
 
 /**
