@@ -9,9 +9,23 @@ function Start () {
 }
 
 function Update () {
+
+	var currentState = anim.GetCurrentAnimatorStateInfo(animLayer);
 	
-	if(Input.GetButtonDown("Jump") && !anim.GetBool("roll") && !anim.GetBool("busy")){
-		anim.SetBool("roll", true);
+	if(!currentState.IsName("Rolling") && !anim.IsInTransition(animLayer)){
+	
+		//raw input (for rolling, mostly)
+		var xRaw = Input.GetAxisRaw("Horizontal");
+		var yRaw = Input.GetAxisRaw("Vertical");
+		
+		//send input to animator
+		anim.SetFloat("xRaw", xRaw);
+		anim.SetFloat("yRaw", yRaw);
+	
+	}
+	
+	if(Input.GetButtonDown("Jump") && !anim.GetBool("busy")){
+		anim.SetTrigger("roll");
 	}
 
 }
