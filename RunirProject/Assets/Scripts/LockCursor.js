@@ -1,5 +1,5 @@
 #pragma strict
 
-function Update(){
+function Start(){
 	Cursor.lockState = CursorLockMode.Locked;
 }

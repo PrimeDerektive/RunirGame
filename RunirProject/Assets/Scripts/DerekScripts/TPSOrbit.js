@@ -69,8 +69,8 @@ function LateUpdate () {
     
     	var anim = target.GetComponent.<Animator>();
     	var currentState = anim.GetCurrentAnimatorStateInfo(2);
-    	if(currentState.IsName("Attack1")) xSpeed = 30;
-    	else xSpeed = 90;
+    	//if(currentState.IsName("2hAttack1") || currentState.IsName("2hAttack2") || currentState.IsName("2hAttack3") ) xSpeed = 10;
+    	xSpeed = 90;
     	
         
         //calculate angle between cam and player forward

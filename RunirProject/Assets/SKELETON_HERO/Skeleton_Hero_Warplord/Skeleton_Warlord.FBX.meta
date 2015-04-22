@@ -1920,7 +1920,7 @@ ModelImporter:
       firstFrame: 3301
       lastFrame: 3336
       wrapMode: 1
-      orientationOffsetY: 0
+      orientationOffsetY: 10
       level: 0
       cycleOffset: 0
       loop: 0
@@ -1945,17 +1945,17 @@ ModelImporter:
             inSlope: 0
             outSlope: 0
             tangentMode: 0
-          - time: .298122525
+          - time: .311803132
             value: 0
             inSlope: 0
             outSlope: 0
             tangentMode: 0
-          - time: .338026524
+          - time: .331846684
             value: 1
             inSlope: 0
             outSlope: 0
             tangentMode: 0
-          - time: .363850981
+          - time: .351890236
             value: 0
             inSlope: 0
             outSlope: 0
@@ -3421,13 +3421,13 @@ ModelImporter:
       firstFrame: 5299
       lastFrame: 5334
       wrapMode: 1
-      orientationOffsetY: 0
+      orientationOffsetY: 30
       level: 0
       cycleOffset: 0
       loop: 0
       loopTime: 1
       loopBlend: 1
-      loopBlendOrientation: 0
+      loopBlendOrientation: 1
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1

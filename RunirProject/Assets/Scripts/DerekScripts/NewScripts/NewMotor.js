@@ -38,5 +38,5 @@ function RotateTowards(targetDir : Vector3){
 	targetDir.y = transform.forward.y; //kill Y so we only rotate on Y axis
 	var angleDifference = Utilities.FindTurningAngle(transform.forward, targetDir);
 	anim.SetFloat("direction", angleDifference);
-	transform.forward = Vector3.Lerp(transform.forward, targetDir, Time.deltaTime*7.5);
+	transform.forward = Vector3.Lerp(transform.forward, targetDir, Time.deltaTime*10);
 }

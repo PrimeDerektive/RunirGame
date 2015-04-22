@@ -2,10 +2,10 @@
 
 var moveDamp : float = 0.3;
 
-private var anim : Animator;
+private var motor : NewMotor;
 
 function Start () {
-	anim = GetComponent.<Animator>();
+	motor = GetComponent.<NewMotor>();
 }
 
 function Update () {
@@ -14,18 +14,11 @@ function Update () {
 	var xInput = Input.GetAxis("Horizontal");
 	var yInput = Input.GetAxis("Vertical");
 	
-	//send input to animator
-	anim.SetFloat("speedX", xInput, moveDamp, Time.deltaTime);
-	anim.SetFloat("speedY", yInput, moveDamp, Time.deltaTime);
+	//send input to motor
+	motor.Move(xInput*0.35, yInput*0.35, moveDamp);
 	
 	//Rotate to match camera forward
-	RotateTowards(Camera.main.transform.forward);
+	//if(GetComponent.<Animator>().GetCurrentAnimatorStateInfo(2).IsName("Nothing") || GetComponent.<Animator>().IsInTransition(2))
+	motor.RotateTowards(Camera.main.transform.forward);
 	
-}
-
-function RotateTowards(targetDir : Vector3){
-	targetDir.y = transform.forward.y; //kill Y so we only rotate on Y axis
-	var angleDifference = Utilities.FindTurningAngle(transform.forward, targetDir);
-	anim.SetFloat("direction", angleDifference);
-	transform.forward = Vector3.Lerp(transform.forward, targetDir, Time.deltaTime*7.5);
 }
