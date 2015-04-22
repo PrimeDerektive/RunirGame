@@ -7,7 +7,7 @@ public class Rolling extends StateMachineBehaviour{
 	}
 	
 	public override function OnStateUpdate(animator : Animator, stateInfo : AnimatorStateInfo, layerIndex : int) {
-		if(stateInfo.normalizedTime >= 0.75 && animator.GetBool("busy")){
+		if(stateInfo.normalizedTime >= 0.65 && animator.GetBool("busy")){
 			animator.SetBool("busy", false);
 		}
 	}

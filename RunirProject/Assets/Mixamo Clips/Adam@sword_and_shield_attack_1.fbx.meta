@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: a8cbf1582936f4d4a954f387281d5131
 ModelImporter:
-  serializedVersion: 16
+  serializedVersion: 18
   fileIDToRecycleName:
     100000: //RootNode
     100002: Adam_belt_geo
@@ -203,6 +203,7 @@ ModelImporter:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
     optimizeGameObjects: 0
+    motionNodeName: 
     animationCompression: 3
     animationRotationError: .5
     animationPositionError: .5
@@ -280,21 +281,21 @@ ModelImporter:
           postInfinity: 2
       events:
       - time: .0344713256
-        functionName: JumpAttackStart
+        functionName: MeleeStart
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
       - time: .501066089
-        functionName: JumpAttackApex
+        functionName: MeleeApex
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
       - time: .616204679
-        functionName: JumpAttackFinish
+        functionName: MeleeStop
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
@@ -482,11 +483,13 @@ ModelImporter:
     generateSecondaryUV: 0
     useFileUnits: 1
     optimizeMeshForGPU: 1
+    keepQuads: 0
     weldVertices: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
+    useFileScale: 0
   tangentSpace:
     normalSmoothAngle: 60
     splitTangentsAcrossUV: 1
@@ -1337,3 +1340,5 @@ ModelImporter:
   animationType: 3
   additionalBone: 0
   userData: 
+  assetBundleName: 
+  assetBundleVariant: 

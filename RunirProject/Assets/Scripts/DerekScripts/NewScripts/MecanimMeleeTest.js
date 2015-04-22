@@ -16,28 +16,38 @@ private var fireDownTime : float = 0.0;
 function Update () {
 
 	var currentState = anim.GetCurrentAnimatorStateInfo(animLayer);
+	var nextState = anim.GetNextAnimatorStateInfo(animLayer);
 
-	if(Input.GetButtonDown("Fire1") && (currentState.IsName("Nothing") || currentState.IsName("Rolling"))){
+	if(Input.GetButtonDown("Fire1") && (currentState.IsName("Nothing") || currentState.IsName("BowFire")) && !anim.GetBool("busy")){
 		anim.SetTrigger("fireDown");
 	}
 	
 	
-	if(Input.GetButton("Fire1") && (currentState.IsName("Nothing") || currentState.IsName("ChargeUp"))){
-		fireDownTime += Time.deltaTime;
-		anim.SetFloat("fireDownTime", fireDownTime);
+	if(Input.GetButton("Fire1") && (currentState.IsName("Nothing") || currentState.IsName("ChargeUp")) && !anim.GetBool("busy")){
+		fireDownTime = anim.GetFloat("fireDownTime");
+		anim.SetFloat("fireDownTime", fireDownTime+Time.deltaTime);
+	}
+	
+	if(anim.GetFloat("fireDownTime") > 0.0 && anim.IsInTransition(animLayer) && !nextState.IsName("ChargeUp") && !nextState.IsName("FullyCharged")){
+		anim.SetFloat("fireDownTime", 0.0);
 	}
 
-
-	if(Input.GetButtonUp("Fire1") && !anim.GetBool("busy")){
+	if(Input.GetButtonUp("Fire1") && !anim.GetBool("busy") /*&& currentState.IsName("BowDraw")*/){
 		anim.SetTrigger("fireUp");
+	}
+	
+	if(Input.GetButtonDown("Fire2")){
+		anim.SetBool("block", true);
+	}
+	
+	if(Input.GetButtonUp("Fire2")){
+		anim.SetBool("block", false);
 	}
 
 }
 
 function MeleeStart(){
-	BroadcastMessage("StartWeaponTrail");
-	anim.SetBool("busy", true);
-	
+	BroadcastMessage("StartWeaponTrail");	
 }
 	
 function MeleeApex(){
