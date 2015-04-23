@@ -10,7 +10,7 @@ var audioSource : AudioSource;
 function Start(){
 	audioSource = GetComponent.<AudioSource>();
 	glowRenderer.material.SetFloat("_Emission", 0.0);
-	//StartCoroutine(StartCharging(3.0));
+	StartCoroutine(StartCharging(3.0));
 }
 
 function StartCharging(chargeTime : float){
