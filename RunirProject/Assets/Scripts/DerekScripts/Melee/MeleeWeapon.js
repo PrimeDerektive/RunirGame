@@ -5,12 +5,12 @@ var chargedEffects : ParticleSystem[];
 var chargedSound : AudioClip;
 
 var glowRenderer : Renderer;
+var glowColor : Color;
 var audioSource : AudioSource;
 
 function Start(){
-	audioSource = GetComponent.<AudioSource>();
-	glowRenderer.material.SetFloat("_Emission", 0.0);
-	StartCoroutine(StartCharging(3.0));
+	if(!audioSource) audioSource = GetComponent.<AudioSource>();
+	glowRenderer.material.SetColor("_GlowColorMult", Color.black);
 }
 
 function StartCharging(chargeTime : float){
@@ -20,15 +20,14 @@ function StartCharging(chargeTime : float){
 	while(timer < chargeTime){
 		timer += Time.deltaTime;
 		var t : float = timer/chargeTime;
-		//glowRenderer.material.SetFloat(
-			//"_Emission",
-			//Mathf.Lerp(0.0, 5.0, t)
-		//);
+		glowRenderer.material.SetColor(
+			"_GlowColorMult",
+			Color.Lerp(Color.black, glowColor, t)
+		);
 		audioSource.volume = Mathf.Lerp(0.25, 0.75, t);
 		audioSource.pitch = Mathf.Lerp(0.75, 0.9, t);
 		yield;
 	}
-	FullyCharged();
 }
 
 function StopCharging(transitionTime : float){
@@ -40,15 +39,16 @@ function StopCharging(transitionTime : float){
 	while(timer < transitionTime){
 		timer += Time.deltaTime;
 		var t : float = timer/transitionTime;
-		glowRenderer.material.SetFloat(
-			"_Emission",
-			Mathf.Lerp(5.0, 0.0, t)
+		glowRenderer.material.SetColor(
+			"_GlowColorMult",
+			Color.Lerp(glowColor, Color.black, t)
 		);
 		yield;
 	}
 }
 
 function FullyCharged(){
+	glowRenderer.material.SetColor("_GlowColorMult", glowColor);
 	DisableEffects(chargingEffects);
 	EnableEffects(chargedEffects);
 	//audioSource.pitch = 1.0;
