@@ -23,7 +23,7 @@ private var randomDir : float;
 
 function Awake(){
 	textMeshes = GetComponentsInChildren.<TextMesh>();
-	print(textMeshes[0].characterSize);
+	//print(textMeshes[0].characterSize);
 }
 
 function OnDisable(){

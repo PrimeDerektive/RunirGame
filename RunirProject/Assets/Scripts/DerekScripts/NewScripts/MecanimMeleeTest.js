@@ -22,13 +22,12 @@ function Update () {
 		anim.SetTrigger("fireDown");
 	}
 	
-	
-	if(Input.GetButton("Fire1") && (currentState.IsName("Nothing") || currentState.IsName("ChargeUp")) && !anim.GetBool("busy")){
+	if(Input.GetButton("Fire1") && (currentState.IsName("Nothing") || currentState.IsName("ChargeUp") || currentState.IsName("2hChargeUp")) && !anim.GetBool("busy")){
 		fireDownTime = anim.GetFloat("fireDownTime");
 		anim.SetFloat("fireDownTime", fireDownTime+Time.deltaTime);
 	}
 	
-	if(anim.GetFloat("fireDownTime") > 0.0 && anim.IsInTransition(animLayer) && !nextState.IsName("ChargeUp") && !nextState.IsName("FullyCharged")){
+	if(anim.GetFloat("fireDownTime") > 0.0 && anim.IsInTransition(animLayer) && !nextState.IsName("ChargeUp") && !nextState.IsName("FullyCharged") && !nextState.IsName("2hChargeUp") && !nextState.IsName("2hFullyCharged")){
 		anim.SetFloat("fireDownTime", 0.0);
 	}
 
@@ -49,13 +48,23 @@ function Update () {
 function MeleeStart(){
 	BroadcastMessage("StartWeaponTrail");	
 }
+
+var attackLayers : LayerMask;
 	
 function MeleeApex(){
 	audioSource.pitch = Random.Range(0.9, 1.0);
 	audioSource.PlayOneShot(swingSound, 1.0);
+	var hit : RaycastHit;
+	if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, hit, 4.0, attackLayers)){
+		hit.collider.gameObject.SendMessage("TakeDamage", hit);
+	}
 }
 
 function MeleeStop(){
 	BroadcastMessage("StopWeaponTrail");
+	anim.SetBool("busy", false);
+}
+
+function FireArrow(){
 	anim.SetBool("busy", false);
 }

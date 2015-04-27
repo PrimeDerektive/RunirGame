@@ -74,7 +74,7 @@ function GetObject(name : String, pos : Vector3, rot : Quaternion) : GameObject{
  
 			else{
  
-				Debug.Log("No objects available in pool! Instantiating a new one.");
+				//Debug.Log("No objects available in pool! Instantiating a new one.");
  
 				var newObj : GameObject = Instantiate(objectsToPool[i], pos, rot);
 				
@@ -100,7 +100,7 @@ function PoolObject(obj : GameObject){
  
 		if(obj.name == objectsToPool[i].name){
  
-			Debug.Log("Pooling object.");
+			//Debug.Log("Pooling object.");
  
 			obj.SetActiveRecursively(false);
  
@@ -116,7 +116,7 @@ function PoolObject(obj : GameObject){
 	
 	if(!pooled){
 	
-		Debug.Log("Error: there are no pools of this object.");
+		//Debug.Log("Error: there are no pools of this object.");
 	
 	}
  

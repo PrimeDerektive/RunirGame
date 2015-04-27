@@ -8,7 +8,7 @@ var glowRenderer : Renderer;
 var glowColor : Color;
 var audioSource : AudioSource;
 
-function Start(){
+function Awake(){
 	if(!audioSource) audioSource = GetComponent.<AudioSource>();
 	glowRenderer.material.SetColor("_GlowColorMult", Color.black);
 }
@@ -28,6 +28,14 @@ function StartCharging(chargeTime : float){
 		audioSource.pitch = Mathf.Lerp(0.75, 0.9, t);
 		yield;
 	}
+}
+
+function StopCharging(){
+	StopCoroutine("StartCharging");
+	DisableEffects(chargingEffects);
+	DisableEffects(chargedEffects);
+	audioSource.Stop();
+	glowRenderer.material.SetColor("_GlowColorMult", Color.black);
 }
 
 function StopCharging(transitionTime : float){
