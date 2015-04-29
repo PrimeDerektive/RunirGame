@@ -16,9 +16,6 @@ class AI_Wander extends StateBehaviour{
 	var maxDistance : float = 8.0;
 	//if the AI exceeds this distance from where he started, he will cease wandering and return to the origin
 	var maxRangeFromOrigin : float = 20.0;
-	//each time the AI reachs a wander destination, it waits  a random duration from minPause - maxPause
-	var minPause : float = 2.0;
-	var maxPause : float = 4.0;
 	
 	//private variables
 	
@@ -27,7 +24,7 @@ class AI_Wander extends StateBehaviour{
 	//starting position, stored in Awake()	
 	private var origin : Vector3; 
 	//position chosen to move toward each time the entity wanders
-	var wanderPos : Vector3 = Vector3.zero; 
+	private var wanderPos : Vector3 = Vector3.zero; 
 	
 	//cached references
 	
@@ -43,7 +40,9 @@ class AI_Wander extends StateBehaviour{
 
 	function OnEnable(){
 		target.Value = null; //we can only be in this state without a target
-		StartCoroutine("Wander");
+		var randomDir = Quaternion.Euler(0, Random.Range(0.0, 359.9), 0) * transform.forward; //get a random direction on the y plane
+		randomPos = transform.position + randomDir * Random.Range(minDistance, maxDistance); //add a random distance from minDistance - maxDistance
+		agent.SetDestination(wanderPos);
 	}
 	
 	function OnDisable(){
@@ -51,7 +50,7 @@ class AI_Wander extends StateBehaviour{
 		agent.ResetPath(); //clear the NavMeshAgent's current path
 	}
 	
-	function Wander(){
+	function Update(){
 		while(true){
 		
 			//always check for targets first
