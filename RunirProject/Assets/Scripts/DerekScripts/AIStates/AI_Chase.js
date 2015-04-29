@@ -21,6 +21,7 @@ class AI_Chase extends StateBehaviour{
 		if(target.Value){
 			var targetDir = (target.Value.transform.position - transform.position).normalized;
 			GetComponent.<NewMotor>().RotateTowards(targetDir);
+			agent.SetDestination(target.Value.transform.position);
 		}
 	}
 
