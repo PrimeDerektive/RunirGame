@@ -1,6 +1,6 @@
 ﻿#pragma strict
 
-class AI_Wander extends StateBehaviour{
+class AI_PathToRandomPoint extends StateBehaviour{
 
 	//public variables
 	
@@ -41,63 +41,32 @@ class AI_Wander extends StateBehaviour{
 	function OnEnable(){
 		target.Value = null; //we can only be in this state without a target
 		var randomDir = Quaternion.Euler(0, Random.Range(0.0, 359.9), 0) * transform.forward; //get a random direction on the y plane
-		randomPos = transform.position + randomDir * Random.Range(minDistance, maxDistance); //add a random distance from minDistance - maxDistance
-		agent.SetDestination(wanderPos);
+		var randomPos = transform.position + randomDir * Random.Range(minDistance, maxDistance); //add a random distance from minDistance - maxDistance
+		if(Vector3.Distance(transform.position, origin) > maxRangeFromOrigin) randomPos = origin; //if we're too far from the origin, return
+		agent.SetDestination(randomPos);
 	}
 	
 	function OnDisable(){
-		StopCoroutine("Wander");
 		agent.ResetPath(); //clear the NavMeshAgent's current path
 	}
 	
+	private var nextTargetCheck : float = 0.0;
+	
 	function Update(){
-		while(true){
 		
-			//always check for targets first
+		//always check for targets first
+		if(Time.time > nextTargetCheck){
 			CheckForTarget();
-			
-			Debug.Log(agent.remainingDistance);
-			
-			//if we find a target, 
-			if(target.Value) this.SendEvent("TargetFound");		
-			
-			//calculate distance from origin
-			var distanceFromOrigin = Vector3.Distance(transform.position, origin);
-			
-			//we've wandered too far, return to origin
-			if(distanceFromOrigin > maxRangeFromOrigin){
-				//set target position to origin
-				wanderPos = origin;
-			}
-			
-			//if we have a target destination
-			if(wanderPos != Vector3.zero){
-			
-				//but we aren't pathing to it yet
-				if(agent.destination != wanderPos){
-					//start pathing to it
-					agent.SetDestination(wanderPos);
-				}
-				else{ //we must be pathing to our destination, print remaining distance					
-					
-					//if we've reached our destination
-					if(agent.remainingDistance <= agent.stoppingDistance){
-						//wait a couple seconds
-						yield WaitForSeconds(Random.Range(minPause, maxPause)); 
-						//unset wanderPos
-						wanderPos = Vector3.zero;					
-					}				
-					
-				}
-				
-			}
-			else{ //we have no target destination, find a new one
-				var randomDir = Quaternion.Euler(0, Random.Range(0.0, 359.9), 0) * transform.forward; //get a random direction on the y plane
-				wanderPos = transform.position + randomDir * Random.Range(minDistance, maxDistance); //add a random distance from minDistance - maxDistance
-			}
-			
-			yield WaitForSeconds(0.1);
+			nextTargetCheck = Time.time + 0.1;
 		}
+		
+		if(agent.hasPath && agent.remainingDistance <= agent.stoppingDistance){
+			this.SendEvent("FINISHED");
+		}
+					
+		//if we find a target, exit this state
+		if(target.Value) this.SendEvent("TargetFound");		
+			
 		
 	} //eof Wander()
 	
