@@ -7,6 +7,9 @@ as well as direction and turnSpeed variables for rotation
 
 **/ 
 
+//used to reduce movement speed in certain situations
+var moveSpeedModifier : float = 1.0;
+
 //used in calculating angular speed
 private var lastForward : Vector3;
 
@@ -30,8 +33,8 @@ the Move() function is designed to be called by a handler script
 to drive the motor either horizontally (x) or vertically (y)
 **/
 function Move(x : float, y : float, dampTime : float) {
-	anim.SetFloat("speedX", x, dampTime, Time.deltaTime);
-	anim.SetFloat("speedY", y, dampTime, Time.deltaTime);
+	anim.SetFloat("speedX", x*moveSpeedModifier, dampTime, Time.deltaTime);
+	anim.SetFloat("speedY", y*moveSpeedModifier, dampTime, Time.deltaTime);
 }
 
 function RotateTowards(targetDir : Vector3){
