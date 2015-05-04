@@ -15,7 +15,7 @@ function Update () {
 	var yInput = Input.GetAxis("Vertical");
 	
 	//send input to motor
-	motor.Move(xInput*0.35, yInput*0.35, moveDamp);
+	motor.Move(xInput, yInput, moveDamp);
 	
 	//Rotate to match camera forward
 	//if(GetComponent.<Animator>().GetCurrentAnimatorStateInfo(2).IsName("Nothing") || GetComponent.<Animator>().IsInTransition(2))

@@ -4,12 +4,7 @@ class AI_PathToRandomPoint extends StateBehaviour{
 
 	//public variables
 	
-	//the distance within which the AI can detect targets
-	var targetRange : float = 5.0;
-	//the view angle within which the AI can detect targets
-	var targetAngle : float = 60.0;
-	//the LayerMask of colliders that can be considered targets (most likely Player)
-	var targetLayers : LayerMask;
+	
 	
 	//each time the AI wanders, it is a random distance from minDistance - maxDistance
 	var minDistance : float = 4.0;
@@ -27,12 +22,13 @@ class AI_PathToRandomPoint extends StateBehaviour{
 	private var wanderPos : Vector3 = Vector3.zero; 
 	
 	//cached references
-	
 	private var agent : NavMeshAgent;
+	private var baseAI : BaseAI;
 	
 	function Awake(){
 		//cache references
 		agent = GetComponent.<NavMeshAgent>();
+		baseAI = GetComponent.<BaseAI>();
 		target = blackboard.GetGameObjectVar("target");
 		//store origin
 		origin = transform.position;
@@ -56,44 +52,18 @@ class AI_PathToRandomPoint extends StateBehaviour{
 		
 		//always check for targets first
 		if(Time.time > nextTargetCheck){
-			CheckForTarget();
+			var newTarget = baseAI.CheckForTarget();
+			if(newTarget){
+				target.Value = newTarget;
+				this.SendEvent("TargetFound");
+			}
 			nextTargetCheck = Time.time + 0.1;
 		}
 		
 		if(agent.hasPath && agent.remainingDistance <= agent.stoppingDistance){
 			this.SendEvent("FINISHED");
-		}
-					
-		//if we find a target, exit this state
-		if(target.Value) this.SendEvent("TargetFound");		
-			
+		}			
 		
-	} //eof Wander()
-	
-	function CheckForTarget(){
-
-		//sweep for target colliders within range
-		var potentialTargets : Collider[] = Physics.OverlapSphere(transform.position, targetRange, targetLayers);
-
-		//loop through potential targets
-		for(var i = 0; i < potentialTargets.Length; i++){
-			
-			//get direction to target
-			var dirToPotentialTarget : Vector3 = potentialTargets[i].transform.position - transform.position;
-			
-			//get angle between forward and target dir
-			var angleToPotentialTarget : float = Vector3.Angle(transform.forward, dirToPotentialTarget);
-			
-			//if the target is within visible angle range
-			if(angleToPotentialTarget <= targetAngle){
-				
-				//set him as the target
-				target.Value = potentialTargets[i].gameObject;
-
-			}
-			
-		} //eof potentialTargets loop
-		
-	} //eof CheckForTarget()
+	}
 
 }

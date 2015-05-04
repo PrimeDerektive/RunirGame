@@ -55,7 +55,8 @@ function MeleeApex(){
 	audioSource.pitch = Random.Range(0.9, 1.0);
 	audioSource.PlayOneShot(swingSound, 1.0);
 	var hit : RaycastHit;
-	if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, hit, 4.0, attackLayers)){
+	var dir = (Camera.main.transform.position - Camera.main.transform.forward * 5.0) + Camera.main.transform.forward;
+	if(Physics.SphereCast(dir, 5.0, Camera.main.transform.forward, hit, 4.0, attackLayers)){
 		hit.collider.gameObject.SendMessage("TakeDamage", hit);
 	}
 }

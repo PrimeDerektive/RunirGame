@@ -1,7 +1,5 @@
 ﻿#pragma strict
 
-#pragma strict
-
 class AI_Wait extends StateBehaviour{
 
 	
@@ -16,12 +14,13 @@ class AI_Wait extends StateBehaviour{
 	private var wanderPos : Vector3 = Vector3.zero; 
 	
 	//cached references
-	
 	private var agent : NavMeshAgent;
+	private var baseAI : BaseAI;
 	
 	function Awake(){
 		//cache references
 		agent = GetComponent.<NavMeshAgent>();
+		baseAI = GetComponent.<BaseAI>();
 		target = blackboard.GetGameObjectVar("target");
 	}
 
@@ -31,7 +30,7 @@ class AI_Wait extends StateBehaviour{
 	}
 	
 	function OnDisable(){
-		//StopCoroutine("Wander");
+		StopCoroutine("Wait");
 		//agent.ResetPath(); //clear the NavMeshAgent's current path
 	}	
 	
@@ -39,5 +38,21 @@ class AI_Wait extends StateBehaviour{
 		yield WaitForSeconds(Random.Range(minWaitTime, maxWaitTime));
 		this.SendEvent("FINISHED");
 	}
+	
+	private var nextTargetCheck : float = 0.0;
+	
+	function Update(){
+		
+		//always check for targets first
+		if(Time.time > nextTargetCheck){
+			var newTarget = baseAI.CheckForTarget();
+			if(newTarget){
+				target.Value = newTarget;
+				this.SendEvent("TargetFound");
+			}
+			nextTargetCheck = Time.time + 0.1;
+		}
+		
+	}		
 
 }

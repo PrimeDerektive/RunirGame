@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 929f35178c66e144db2f78112e8181bd
 ModelImporter:
-  serializedVersion: 16
+  serializedVersion: 18
   fileIDToRecycleName:
     100000: adventurer
     100002: Bip01
@@ -105,6 +105,7 @@ ModelImporter:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
     optimizeGameObjects: 0
+    motionNodeName: 
     animationCompression: 1
     animationRotationError: .5
     animationPositionError: .5
@@ -168,7 +169,7 @@ ModelImporter:
             inSlope: 0
             outSlope: 0
             tangentMode: 0
-          - time: .591703057
+          - time: .629798293
             value: 0
             inSlope: 0
             outSlope: 0
@@ -247,11 +248,13 @@ ModelImporter:
     generateSecondaryUV: 0
     useFileUnits: 1
     optimizeMeshForGPU: 1
+    keepQuads: 0
     weldVertices: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
+    useFileScale: 0
   tangentSpace:
     normalSmoothAngle: 60
     splitTangentsAcrossUV: 1
@@ -809,3 +812,5 @@ ModelImporter:
   animationType: 3
   additionalBone: 1
   userData: 
+  assetBundleName: 
+  assetBundleVariant: 
