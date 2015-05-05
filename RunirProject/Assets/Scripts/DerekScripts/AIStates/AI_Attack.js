@@ -3,35 +3,33 @@ import BehaviourMachine;
 
 class AI_Attack extends StateBehaviour{
 
-	var attackDistance : float = 3.0;
-	
-	private var targetObject : GameObjectVar;
+	var escapeRange : float = 3.0;
+
 	private var target : Transform;
-	private var motor : MecanimMotor_Base;
+	private var motor : NewMotor;
 	private var anim : Animator;
-	
-	private var startTime : float = 0.0;
-	private var stopTime : float = 0.0;
 
 	function Awake(){
-		targetObject = blackboard.GetGameObjectVar("target");
-		motor = GetComponent.<MecanimMotor_Base>();
+		motor = GetComponent.<NewMotor>();
 		anim = GetComponent.<Animator>();
-		anim.SetLayerWeight(3, 1.0);
-	 	anim.SetBool("melee", true);
 	}
 	
 	function OnEnable(){
-		target = targetObject.Value.transform;
-		var duration = Random.Range(1.0, 4.0);
-		stopTime = Time.time + duration;
-		canAttack = false;
-		print("I am now attacking.");
+		target = blackboard.GetGameObjectVar("target").Value.transform;
+		//var duration = Random.Range(1.0, 4.0);
+		//stopTime = Time.time + duration;
+		//canAttack = false;
+		anim.SetTrigger("attack");
 	}
 	
-	private var canAttack : boolean = false;
 	
 	function Update(){
+		var dirToTarget = (target.position - transform.position).normalized;
+		motor.RotateTowards(dirToTarget);
+		
+		if(Vector3.Distance(target.position, transform.position) > escapeRange) this.SendEvent("TargetLost");
+		
+		/*
 		if(!anim.GetBool("staggered")){
 		
 			if(Time.time >= stopTime && anim.GetCurrentAnimatorStateInfo(3).IsName("Nothing")) this.SendEvent("FINISHED");
@@ -48,6 +46,11 @@ class AI_Attack extends StateBehaviour{
 			}
 			
 		}
+		*/
+	}
+	
+	function AttackFinished(){
+		this.SendEvent("FINISHED");
 	}
 	
 }

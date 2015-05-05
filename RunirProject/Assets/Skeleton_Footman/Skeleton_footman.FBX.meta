@@ -12,7 +12,7 @@ labels:
 - warrior
 - undead
 ModelImporter:
-  serializedVersion: 16
+  serializedVersion: 18
   fileIDToRecycleName:
     100000: Bip01 R Calf
     100002: Bip01 R Toe0
@@ -1395,7 +1395,7 @@ ModelImporter:
             inSlope: 0
             outSlope: 0
             tangentMode: 0
-          - time: .600000024
+          - time: .645238101
             value: 0
             inSlope: 0
             outSlope: 0
@@ -2650,11 +2650,13 @@ ModelImporter:
     generateSecondaryUV: 0
     useFileUnits: 1
     optimizeMeshForGPU: 1
+    keepQuads: 0
     weldVertices: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
+    useFileScale: 0
   tangentSpace:
     normalSmoothAngle: 60
     splitTangentsAcrossUV: 1
@@ -3156,3 +3158,5 @@ ModelImporter:
   animationType: 3
   additionalBone: 1
   userData: 
+  assetBundleName: 
+  assetBundleVariant: 
