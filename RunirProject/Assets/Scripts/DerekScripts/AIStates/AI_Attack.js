@@ -4,6 +4,8 @@ import BehaviourMachine;
 class AI_Attack extends StateBehaviour{
 
 	var escapeRange : float = 3.0;
+	var animName : String;
+	var animLayer : int;
 
 	private var target : Transform;
 	private var motor : NewMotor;
@@ -19,13 +21,18 @@ class AI_Attack extends StateBehaviour{
 		//var duration = Random.Range(1.0, 4.0);
 		//stopTime = Time.time + duration;
 		//canAttack = false;
-		anim.SetTrigger("attack");
+		anim.CrossFade(animName, 0.15, animLayer);
 	}
 	
 	
 	function Update(){
 		var dirToTarget = (target.position - transform.position).normalized;
-		motor.RotateTowards(dirToTarget);
+		
+		
+		var currentState = anim.GetCurrentAnimatorStateInfo(animLayer);
+		//only rotate towards target for first half of clip, or if they're no longer in the animation state
+		if(currentState.normalizedTime < 0.25 || !currentState.IsName(animName))
+			motor.RotateTowards(dirToTarget);
 		
 		if(Vector3.Distance(target.position, transform.position) > escapeRange) this.SendEvent("TargetLost");
 		
@@ -49,8 +56,8 @@ class AI_Attack extends StateBehaviour{
 		*/
 	}
 	
-	function AttackFinished(){
-		this.SendEvent("FINISHED");
+	function Finished(){
+		if(this.enabled) this.SendEvent("FINISHED");
 	}
 	
 }
