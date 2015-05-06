@@ -15,17 +15,18 @@ class AI_Wait extends StateBehaviour{
 	
 	//cached references
 	private var agent : NavMeshAgent;
+	private var motor : NewMotor;
 	private var baseAI : BaseAI;
 	
 	function Awake(){
 		//cache references
 		agent = GetComponent.<NavMeshAgent>();
+		motor = GetComponent.<NewMotor>();
 		baseAI = GetComponent.<BaseAI>();
 		target = blackboard.GetGameObjectVar("target");
 	}
 
 	function OnEnable(){
-		target.Value = null; //we can only be in this state without a target
 		StartCoroutine(Wait());
 	}
 	
@@ -43,14 +44,21 @@ class AI_Wait extends StateBehaviour{
 	
 	function Update(){
 		
-		//always check for targets first
-		if(Time.time > nextTargetCheck){
-			var newTarget = baseAI.CheckForTarget();
-			if(newTarget){
-				target.Value = newTarget;
-				this.SendEvent("TargetFound");
+		//always check for targets first, if we don't have one
+		if(!target.Value){
+			if(Time.time > nextTargetCheck){
+				var newTarget = baseAI.CheckForTarget();
+				if(newTarget){
+					target.Value = newTarget;
+					this.SendEvent("TargetFound");
+				}
+				nextTargetCheck = Time.time + 0.1;
 			}
-			nextTargetCheck = Time.time + 0.1;
+		}
+		else{
+			//we have a target, rotate towards him
+			var dirToTarget = (target.Value.transform.position - transform.position).normalized;
+			motor.RotateTowards(dirToTarget);
 		}
 		
 	}		

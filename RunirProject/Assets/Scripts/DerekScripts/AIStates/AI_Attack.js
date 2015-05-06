@@ -34,7 +34,6 @@ class AI_Attack extends StateBehaviour{
 		if(currentState.normalizedTime < 0.25 || !currentState.IsName(animName))
 			motor.RotateTowards(dirToTarget);
 		
-		if(Vector3.Distance(target.position, transform.position) > escapeRange) this.SendEvent("TargetLost");
 		
 		/*
 		if(!anim.GetBool("staggered")){

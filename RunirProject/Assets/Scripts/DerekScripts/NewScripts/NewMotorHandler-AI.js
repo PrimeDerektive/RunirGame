@@ -12,7 +12,7 @@ function Start () {
 	anim = GetComponent.<Animator>();
 }
 
-function Update () {
+function LateUpdate () {
 	
 	if(!anim.applyRootMotion){
 		

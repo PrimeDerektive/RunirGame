@@ -15,6 +15,7 @@ class AI_Pursuit extends StateBehaviour{
 	
 	function OnEnable(){
 		target = blackboard.GetGameObjectVar("target").Value.transform;
+		agent.Resume();
 		print("I am now pursuing.");
 	}
 	
