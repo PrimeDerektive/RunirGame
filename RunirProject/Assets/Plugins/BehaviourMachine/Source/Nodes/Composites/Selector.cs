@@ -21,6 +21,11 @@ namespace BehaviourMachine {
         [System.NonSerialized]
         int m_CurrentChildIndex = 0;
 
+        public override void Start () {
+            if (status == Status.Ready)
+                m_CurrentChildIndex = 0;
+        }
+
         public override Status Update () {
             // Returns to the first child when finished
             if (m_CurrentChildIndex >= children.Length)
@@ -45,10 +50,6 @@ namespace BehaviourMachine {
             }
 
             return childStatus;
-        }
-        
-        public override void End () {
-            m_CurrentChildIndex = 0;
         }
 
         public override void OnValidate () {

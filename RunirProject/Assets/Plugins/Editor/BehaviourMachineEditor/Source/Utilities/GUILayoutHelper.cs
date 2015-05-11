@@ -174,7 +174,7 @@ namespace BehaviourMachineEditor {
                 names.Add("Constant");
 
                 // Can be constant?
-                if (variableInfo.canBeConstant && property.type != typeof(BehaviourMachine.FsmEvent)) {
+                if (variableInfo.canBeConstant && property.type != typeof(BehaviourMachine.FsmEvent) && property.type != typeof(BehaviourMachine.DynamicList)) {
                     if (property.type != typeof(BehaviourMachine.Variable)) {
                         menu.AddItem(new GUIContent("Constant"), isConstant && property.isConcreteVariable, createConstant, property.type);
                     }

@@ -42,13 +42,11 @@ namespace BehaviourMachine {
         [System.NonSerialized]
         bool m_HierarchyChanged;
 
-        [System.NonSerialized]
-        float m_LastRealTime = 0f;
+        bool m_NodesWaked = false;
 
-        [System.NonSerialized]
         bool m_NodesEnabled = false;
-
-        bool m_IsPrefab = true;
+        
+        float m_DeltaTimeAmount = 0f;
         #endregion Members
 
 
@@ -71,7 +69,12 @@ namespace BehaviourMachine {
         /// <summary>
         /// If ignoreTimeScale is true then return the real delta time; otherwise return Time.deltaTime.
         /// </summary>
-        public float deltaTime {get {return m_IgnoreTimeScale ? Time.realtimeSinceStartup - m_LastRealTime : Time.deltaTime;}}
+        public float deltaTime {get {return m_IgnoreTimeScale ? InternalGlobalBlackboard.realDeltaTime + m_DeltaTimeAmount: Time.deltaTime + m_DeltaTimeAmount;}}
+
+        /// <summary>
+        /// Amount of time to add to deltaTime, usefull for Coroutines.
+        /// </summary>
+        public float deltaTimeAmount {get {return m_DeltaTimeAmount;} set {m_DeltaTimeAmount = value;}}
         #endregion Properties
 
 
@@ -79,7 +82,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity timed events.
         /// </summary>
-        public event SimpleCallback onEnable, onDisable, start, fixedUpdate, update, lateUpdate, onDestroy;
+        public event SimpleCallback awake, onEnable, onDisable, start, onDestroy;
         #endregion Events
 
 
@@ -196,15 +199,25 @@ namespace BehaviourMachine {
 
         #region Node Callbacks
         /// <summary>
+        /// Call the Awake method in nodes.
+        /// </summary>
+        void WakeNodes () {
+            m_NodesWaked = true;
+
+            for (int i = 0; i < m_Nodes.Length; i++)
+                m_Nodes[i].Awake();
+        }
+
+        /// <summary>
         /// Call the OnEnable method in nodes.
         /// </summary>
         void OnEnableNodes () {
+            m_NodesEnabled = true;
+
             if (m_Nodes != null) {
                 for (int i = 0; i < m_Nodes.Length; i++)
                     m_Nodes[i].OnEnable();
             }
-
-            m_NodesEnabled = true;
         }
 
         /// <summary>
@@ -234,34 +247,45 @@ namespace BehaviourMachine {
         /// Unity callback called when the script instance is being loaded.
         /// Check link hideFlags. Only used in editor.
         /// </summary>
-        void Awake () {
-            m_IsPrefab = false;
-
+        public virtual void Awake () {
             // Load nodes
-            this.LoadNodes();
+            if (m_Nodes == null)
+                this.LoadNodes();
 
-            // #if UNITY_EDITOR
-            // if (!Application.isPlaying)
-            //     return;
-            // #endif
+            #if UNITY_EDITOR
+            if (!Application.isPlaying)
+                return;
+            #endif
+
+            // Call Awake in nodes
+            this.WakeNodes();
+
+            // Call Awake event
+            if (awake != null)
+                awake();
         }
 
         /// <summary>
         /// OnEnable is called when the tree becomes enabled and active.
         /// Call OnEnable Nodes.
         /// </summary>
-        void OnEnable () {
+        public virtual void OnEnable () {
             #if UNITY_EDITOR
             if (!Application.isPlaying)
                 return;
             #endif
+
+            // Add this parent to the blackboard to receive system events
+            if (isRoot)
+                blackboard.AddRootParent(this);
 
             // Load nodes
             if (m_Nodes == null)
                 this.LoadNodes();
 
             // Call OnEnable in nodes
-            this.OnEnableNodes();
+            if (!m_NodesEnabled)
+                this.OnEnableNodes();
 
             // Call onEnable event
             if (onEnable != null)
@@ -272,11 +296,15 @@ namespace BehaviourMachine {
         /// OnDisable is called when the tree becomes disabled or inactive.
         /// Call OnDisable Nodes.
         /// </summary>
-        void OnDisable () {
+        public virtual void OnDisable () {
             #if UNITY_EDITOR
             if (!Application.isPlaying)
                 return;
             #endif
+
+            // Remove this parent from blackboard to not receive system events
+            if (isRoot)
+                blackboard.RemoveRootParent(this);
 
             // Call onDisable event
             if (onDisable != null)
@@ -289,7 +317,7 @@ namespace BehaviourMachine {
         /// Start is called just before any of the Update methods are called the first time.
         /// Call Start nodes.
         /// </summary>
-        void Start () {
+        public virtual void Start () {
             #if UNITY_EDITOR
             if (!Application.isPlaying)
                 return;
@@ -300,55 +328,10 @@ namespace BehaviourMachine {
         }
 
         /// <summary>
-        /// Update is called every frame, if the tree is enabled.
-        /// Call Update nodes.
-        /// </summary>
-        void Update () {
-            #if UNITY_EDITOR
-            if (!Application.isPlaying)
-                return;
-            #endif
-
-            if (update != null)
-                update();
-        }
-
-
-        /// <summary>
-        /// FixedUpdate is called every fixed framerate frame, if the tree is enabled.
-        /// Call FixedUpdate nodes.
-        /// </summary>
-        void FixedUpdate () {
-            #if UNITY_EDITOR
-            if (!Application.isPlaying)
-                return;
-            #endif
-
-            if (fixedUpdate != null)
-                fixedUpdate();
-        }
-
-        /// <summary>
-        /// FixedUpdate is called every frame just before Update, if the tree is enabled.
-        /// Call LateUpdate nodes.
-        /// </summary>
-        void LateUpdate () {
-            #if UNITY_EDITOR
-            if (!Application.isPlaying)
-                return;
-            #endif
-
-            if (lateUpdate != null)
-                lateUpdate();
-
-            m_LastRealTime = Time.realtimeSinceStartup;
-        }
-
-        /// <summary>
         /// Unity callback called when the tree will be destroyed.
         /// Call onDestroy nodes.
         /// </summary>
-        protected override void OnDestroy () {
+        public override void OnDestroy () {
             base.OnDestroy();
 
             if (!Application.isPlaying)
@@ -380,6 +363,23 @@ namespace BehaviourMachine {
 
 
         #region Public Methods
+        /// <summary> 
+        /// Tick the first FunctionNode in the tree that has the supplied name.
+        /// <param name="functionName">The name of the FunctionNode to Tick.</param>
+        /// <returns>The status of the ticked FunctionNode or Error if there is no FunctionNode with the supplied name.</returns>
+        /// </summary> 
+        public Status TickFunction (string functionName) {
+            if (this.enabled) {
+                for (int i = 0; i < m_FunctionNodes.Length; i++) {
+                    if (m_FunctionNodes[i].name == functionName) {
+                        m_FunctionNodes[i].OnTick();
+                        return  m_FunctionNodes[i].status;
+                    }
+                }
+            }
+            return Status.Error;
+        }
+
         /// <summary> 
         /// Uses the supplied event on the tree, if fails send the event to all enabled states in the tree.
         /// <param name="eventID">The id of the event. The FsmEvent's id in the Blackboard.</param>
@@ -576,11 +576,9 @@ namespace BehaviourMachine {
 
             m_FunctionNodes = this.GetFunctionNodes();
 
-            // Call Awake in nodes
-            if (!m_IsPrefab && Application.isPlaying) {
-                for (int i = 0; i < m_Nodes.Length; i++)
-                    m_Nodes[i].Awake();
-            }
+            // Awake nodes?
+            if (m_NodesWaked)
+                this.WakeNodes();
 
             // Reenable nodes
             if (m_NodesEnabled)

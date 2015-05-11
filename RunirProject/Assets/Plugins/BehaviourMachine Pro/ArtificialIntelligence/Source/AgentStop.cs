@@ -38,7 +38,7 @@ namespace BehaviourMachine {
         }
 
     	public override Status Update () {
-            // Get the renderer
+            // Get the agent
             NavMeshAgent agent = gameObject.Value != null ? gameObject.Value.GetComponent<NavMeshAgent>() : null;
 
             // Validate members

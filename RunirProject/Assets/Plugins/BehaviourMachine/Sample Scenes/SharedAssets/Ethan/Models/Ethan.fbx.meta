@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: d1edc5c37110d49669734300e80f8667
 ModelImporter:
-  serializedVersion: 16
+  serializedVersion: 18
   fileIDToRecycleName:
     100000: char_cyberKid_Badge
     100002: char_ethan_body
@@ -402,11 +402,13 @@ ModelImporter:
     generateSecondaryUV: 0
     useFileUnits: 1
     optimizeMeshForGPU: 1
+    keepQuads: 0
     weldVertices: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
+    useFileScale: 0
   tangentSpace:
     normalSmoothAngle: 60
     splitTangentsAcrossUV: 1
@@ -1278,3 +1280,5 @@ ModelImporter:
   animationType: 3
   additionalBone: 0
   userData: 
+  assetBundleName: 
+  assetBundleVariant: 

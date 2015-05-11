@@ -212,6 +212,19 @@ namespace BehaviourMachineEditor {
         }
 
         /// <summary> 
+        /// Adds a new dynamic list to the supplied blackboard.
+        /// Automatically handles undo.
+        /// <param name="blackboard">The blackboard to add a new DynamicList.</param>
+        /// <returns>The new variable.</returns>
+        /// </summary>
+        public static DynamicList AddDynamicList (InternalBlackboard blackboard) {
+            BlackboardUtility.RegisterVariableUndo(blackboard, "Add Dynamic List"); 
+            var newVariable = blackboard.AddDynamicList(); 
+            EditorUtility.SetDirty(blackboard);
+            return newVariable;
+        }
+
+        /// <summary> 
         /// Adds a new FsmEvent var to the supplied blackboard.
         /// Automatically handles undo.
         /// <param name="blackboard">The blackboard to add a new FsmEventVar.</param>

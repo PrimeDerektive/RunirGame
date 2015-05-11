@@ -20,7 +20,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// The path status to test.
         /// </summary>
-        [Tooltip("The path status to test")]
+        [Tooltip("The path status to test.\nPathComplete: The path terminates at the destination.\nPathPartial: The path cannot reach the destination.\nPathInvalid: The path is invalid.")]
         public NavMeshPathStatus pathStatus;
 
         [System.NonSerialized]

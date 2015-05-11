@@ -19,9 +19,8 @@ namespace BehaviourMachine {
 
         public string missingNodeType = string.Empty;
 
-        public override Status Update () {
-        	Print.LogWarning("Missing Script Node: " + missingNodeType, tree);
-            return Status.Error;
+        public override void Awake () {
+        	Print.LogWarning("Missing Node Script: " + missingNodeType, owner as UnityEngine.Object);
         }
     }
 }

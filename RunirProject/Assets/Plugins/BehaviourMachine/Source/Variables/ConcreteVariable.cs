@@ -5,6 +5,7 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace BehaviourMachine {
 
@@ -515,6 +516,71 @@ namespace BehaviourMachine {
         /// <param name="id">The unique id of the variable</param>
         /// </summary>
         public ConcreteObjectVar (string name, InternalBlackboard blackboard, int id) : base (name, blackboard, id) {}
+    }
+
+    /// <summary>
+    /// Base class to store List values.
+    /// </summary>
+    [System.Serializable]
+    public class ConcreteDynamicList : DynamicList {
+
+        [System.NonSerialized]
+        List<System.Object> m_List = new List<System.Object>();
+
+        /// <inheritdoc/>
+        public override IList<System.Object> Value {get {return m_List;} set {m_List = new List<System.Object>(value);}}
+
+        /// <inheritdoc/>
+        public override object this [int index] {
+            get {return m_List[index];}
+            set {m_List[index] = value;}
+        }
+
+        /// <inheritdoc/>
+        public override int Count {
+            get {return m_List.Count;}
+        }
+
+        /// <inheritdoc/>
+        public override void Add (object value) {
+            m_List.Add(value);
+        }
+
+        /// <inheritdoc/>
+        public override void Clear () {
+            m_List.Clear();
+        }
+
+        /// <inheritdoc/>
+        public override bool Contains (object value) {
+            return m_List.Contains(value);
+        }
+
+        /// <inheritdoc/>
+        public override int IndexOf (object value) {
+            return m_List.IndexOf(value);
+        }
+
+        /// <inheritdoc/>
+        public override void Insert (int index, object value) {
+            m_List.Insert (index, value);
+        }
+
+        /// <inheritdoc/>
+        public override void Remove (object value) {
+            m_List.Remove(value);
+        }
+
+        /// <inheritdoc/>
+        public override void RemoveAt (int index) {
+            m_List.RemoveAt (index);
+        }
+
+        /// <inheritdoc/>
+        public ConcreteDynamicList () : base () {}
+
+        /// <inheritdoc/>
+        public ConcreteDynamicList (string name, InternalBlackboard blackboard, int id) : base (name, blackboard, id) {}
     }
 
     /// <summary>

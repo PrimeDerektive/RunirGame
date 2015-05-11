@@ -13,7 +13,7 @@ using BehaviourMachine;
 
 namespace BehaviourMachineEditor {
 
-    public class GUIHelper : MonoBehaviour {
+    public class GUIHelper {
 
         public static bool EditorButton (Rect position, int controlID, GUIContent content, GUIStyle style) {
             switch (Event.current.GetTypeForControl(controlID)) {

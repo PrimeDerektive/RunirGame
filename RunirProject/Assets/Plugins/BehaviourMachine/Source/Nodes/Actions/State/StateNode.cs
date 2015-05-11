@@ -32,13 +32,16 @@ namespace BehaviourMachine {
                 state = null;
         }
 
+        public override void Start () {
+            if (state != null && !state.enabled)
+                state.enabled = true;
+        }
+
         public override Status Update () {
             // Validate members
             if (state == null)
                 return Status.Error;
-
-            if (!state.enabled)
-                state.enabled = true;
+            
 
             return state.OnTick();
         }

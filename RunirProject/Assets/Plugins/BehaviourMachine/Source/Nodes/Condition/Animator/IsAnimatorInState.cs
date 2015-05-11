@@ -8,12 +8,12 @@ using System.Collections;
 
 namespace BehaviourMachine {
     /// <summary>
-    /// Returns Success if the Animatior component is in the supplied state; Failure otherwise.
+    /// Returns Success if the Animator component is in the supplied state; Failure otherwise.
     /// </summary>
     [NodeInfo(  category = "Condition/Animator/",
                 icon = "Animator",
-                description = "Returns Success if the Animatior component is in the supplied state; Failure otherwise",
-                url = "http://docs.unity3d.com/ScriptReference/Animator.GetCurrentAnimatorStateInfo.html")]
+                description = "Returns Success if the Animator component is in the supplied state; Failure otherwise",
+                url = "http://docs.unity3d.com/ScriptReference/AnimatorStateInfo.IsName.html")]
     public class IsAnimatorInState : ConditionNode {
 
     	/// <summary>
@@ -23,15 +23,15 @@ namespace BehaviourMachine {
         public GameObjectVar gameObject;
 
         /// <summary>
-        /// The layer's index.
+        /// The layer index.
         /// </summary>
-        [VariableInfo(tooltip = "The layer's index")]
+        [VariableInfo(tooltip = "The layer index")]
         public IntVar layerIndex;
 
         /// <summary>
-        /// The state's name.
+        /// The state name. The name should be in the form Layer.Name, for example "Base.Idle".
         /// </summary>
-        [VariableInfo(tooltip = "The state's name")]
+        [VariableInfo(tooltip = "The state name. The name should be in the form Layer.Name, for example \"Base.Idle\"")]
         public StringVar stateName;
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace BehaviourMachine {
         public override void Reset () {
             gameObject = new ConcreteGameObjectVar(this.self);
             layerIndex = 0;
-            stateName = "State Name";
+            stateName = "Base Layer.State Name";
             considerTransitions = true;
         }
 

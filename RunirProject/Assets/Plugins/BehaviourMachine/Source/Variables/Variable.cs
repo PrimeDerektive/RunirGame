@@ -5,6 +5,7 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace BehaviourMachine {
 
@@ -63,7 +64,13 @@ namespace BehaviourMachine {
         /// Returns the variable blackboard.
         /// </summary>
         public InternalBlackboard blackboard {get {return m_Blackboard;}}
+
+        /// <summary>
+        /// A generic get and set value.
+        /// </summary>
+        public virtual object genericValue {get {return null;} set {}}
         #endregion Properties
+
 
         #region Constructors
         /// <summary>
@@ -121,12 +128,6 @@ namespace BehaviourMachine {
         /// This function is called when the script is loaded or a value is changed in the inspector (Called in the editor only).
         /// </summary>
         public virtual void OnValidate () {}
-
-        /// <summary>
-        /// A generic get and set value.
-        /// </summary>
-        public virtual object genericValue {get {return null;} set {}}
-
         #endregion Public Methods
     }
 
@@ -697,6 +698,96 @@ namespace BehaviourMachine {
     }
 
     /// <summary>
+    /// Base class to store Material values.
+    /// </summary>
+    [System.Serializable]
+    [ConcreteClass(typeof(ConcreteDynamicList))]
+    public abstract class DynamicList : Variable {
+
+        /// <summary>
+        /// The list value.
+        /// </summary>
+        public abstract IList<System.Object> Value {get; set;}
+
+        /// <summary>
+        /// A generic get and set value.
+        /// </summary>
+        public override object genericValue {get {return this.Value;} set {this.Value = value as IList<System.Object>;}}
+
+        /// <summary>
+        /// Get and set an object at the supplied index.
+        /// </summary>
+        public abstract object this [int index] {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Number of elements in the list.
+        /// </summary>
+        public abstract int Count {
+            get;
+        }
+
+        /// <summary>
+        /// Adds an item to the list.
+        /// <param name="value">The value to be added.</param>
+        /// </summary>
+        public abstract void Add (object value);
+
+        /// <summary>
+        /// Removes all items from the list.
+        /// </summary>
+        public abstract void Clear ();
+
+        /// <summary>
+        /// Determines whether the list contains a specific value.
+        /// <param name="value">The value to search for.</param>
+        /// <returns>True if the list has the supplied value; false otherwise.</returns>
+        /// </summary>
+        public abstract bool Contains (object value);
+
+        /// <summary>
+        /// Determines the index of a specific item in the list.
+        /// <param name="value">The value to search value.</param>
+        /// <returns>The index of the supplied element.</returns>
+        /// </summary>
+        public abstract int IndexOf (object value);
+
+        /// <summary>
+        /// Inserts an item to the list at the specified index.
+        /// <param name="index">The index to insert the element.</param>
+        /// <param name="value">The element to be inserted in the list.</param>
+        /// </summary>
+        public abstract void Insert (int index, object value);
+
+        /// <summary>
+        /// Removes an element from the list.
+        /// <param name="value">The element to be removed.</param>
+        /// </summary>
+        public abstract void Remove (object value);
+
+        /// <summary>
+        /// Removes an element on the supplied index.
+        /// <param name="index">.</param>
+        /// </summary>
+        public abstract void RemoveAt (int index);
+
+        /// <summary>
+        /// Constructor for none variables.
+        /// </summary>
+        public DynamicList () : base () {}
+
+        /// <summary>
+        /// Constructor for DynamicList variables that will be added to a blackboard.
+        /// <param name="name">The name of the variable.</param>
+        /// <param name="blackboard">The variable blackboard.</param>
+        /// <param name="id">The unique id of the variable</param>
+        /// </summary>
+        public DynamicList (string name, InternalBlackboard blackboard, int id) : base (name, blackboard, id) {}
+    }
+
+    /// <summary>
     /// FsmEvents are used to change the enabled state in the FSM.
     /// <seealso cref="BehaviourMachine.StateMachine" />
     /// </summary>
@@ -705,10 +796,6 @@ namespace BehaviourMachine {
     public class FsmEvent : Variable {
 
         #region Members
-        [HideInInspector]
-        [SerializeField]
-        int m_EventId;
-
         [HideInInspector]
         [SerializeField]
         bool m_IsSystem;

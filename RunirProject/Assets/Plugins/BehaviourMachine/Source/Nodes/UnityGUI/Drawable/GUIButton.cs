@@ -48,6 +48,12 @@ namespace BehaviourMachine {
         public FloatVar height;
 
         /// <summary>
+        /// If True then the Rect values will be normalized.
+        /// </summary>
+        [VariableInfo(requiredField = false, nullLabel = "Use OnGUI Defaults", tooltip = "If True then the Rect values will be normalized")]
+        public BoolVar normalized;
+
+        /// <summary>
         /// The icon image contained.
         /// </summary>
         [VariableInfo(requiredField = false, nullLabel = "Don't Use", tooltip = "The icon image contained")]
@@ -79,8 +85,17 @@ namespace BehaviourMachine {
             if (!width.isNone) rect1.width = width;
             if (!height.isNone) rect1.height = height;
 
-            // Scale rect
-            rect1.Set(rect1.x / OnGUI.scale, rect1.y / OnGUI.scale, rect1.width / OnGUI.scale, rect1.height / OnGUI.scale);
+            if (!normalized.isNone && normalized.Value) {
+                // Normalize rect
+                rect1.x *= Screen.width;
+                rect1.width *= Screen.width;
+                rect1.y *= Screen.height;
+                rect1.height *= Screen.height;
+            }
+            else {
+                // Scale rect
+                rect1.Set(rect1.x / OnGUI.scale, rect1.y / OnGUI.scale, rect1.width / OnGUI.scale, rect1.height / OnGUI.scale);
+            }
 
             return rect1;
         }
@@ -92,6 +107,7 @@ namespace BehaviourMachine {
             y = new ConcreteFloatVar();
             width = new ConcreteFloatVar();
             height = new ConcreteFloatVar();
+            normalized = true;
             texture = new ConcreteTextureVar();
             text = new ConcreteStringVar();
             tooltip = new ConcreteStringVar();
@@ -99,7 +115,7 @@ namespace BehaviourMachine {
         }
 
         public override Status Update () {
-            // Is OnGUI?
+            // It's OnGUI?
             if (Event.current == null)
                 return Status.Error;
 

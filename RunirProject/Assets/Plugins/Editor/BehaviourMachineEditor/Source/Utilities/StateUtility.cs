@@ -215,6 +215,27 @@ namespace BehaviourMachineEditor {
                 InternalStateBehaviour startState = null, concurrentState = null;
                 InternalAnyState anyState = null;
 
+                // Copy blackboard data?
+                var newBlackboard = gameObject.GetComponent<InternalBlackboard>();
+                if (newBlackboard == null) {
+                    // Get the original blackboard
+                    InternalBlackboard originalBlackboard = originalStates[0].GetComponent<InternalBlackboard>();
+
+                    #if UNITY_4_0_0 || UNITY_4_1 || UNITY_4_2
+                    Undo.RegisterSceneUndo("Paste State");
+                    // Create the new blacbkoard
+                    newBlackboard = gameObject.AddComponent(originalBlackboard.GetType()) as InternalBlackboard;
+                    #else
+                    // Create the new blacbkoard
+                    newBlackboard = gameObject.AddComponent(originalBlackboard.GetType()) as InternalBlackboard;
+                    if (newBlackboard != null)
+                        Undo.RegisterCreatedObjectUndo(newBlackboard, "Paste State");
+                    #endif
+
+                    // Copy serialized values
+                    EditorUtility.CopySerialized(originalBlackboard, newBlackboard);
+                }
+
                 foreach (InternalStateBehaviour state in originalStates) {
                     // Don't clone AnyState in StateMachines
                     if (state != null && (newFsm == null || !(state is InternalAnyState) || newFsm.anyState == null)) {
@@ -235,6 +256,15 @@ namespace BehaviourMachineEditor {
 
                             // Copy serialized values
                             EditorUtility.CopySerialized(state, newState);
+                            
+                            // Update blackboard
+                            if (state.gameObject != newState.gameObject) {
+                                var serialObj = new SerializedObject(newState);
+                                serialObj.FindProperty("m_Blackboard").objectReferenceValue = newBlackboard;
+                                serialObj.ApplyModifiedProperties();
+                                serialObj.Dispose();
+                            }
+
                             // Update the AnyState, StartState and ConcurrentState
                             if (newState is InternalStateMachine) {
                                 var fsm = newState as InternalStateMachine;
@@ -242,6 +272,7 @@ namespace BehaviourMachineEditor {
                                 fsm.concurrentState = null;
                                 fsm.anyState = null;
                             }
+
                             EditorUtility.SetDirty(newState);
 
                             // Set new parent

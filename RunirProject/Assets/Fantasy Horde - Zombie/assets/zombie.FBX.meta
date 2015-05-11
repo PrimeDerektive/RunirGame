@@ -234,16 +234,47 @@ ModelImporter:
       loop: 0
       loopTime: 0
       loopBlend: 0
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
-      loopBlendPositionXZ: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves: []
+      curves:
+      - name: pause
+        curve:
+          serializedVersion: 2
+          curve:
+          - time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+          - time: .276470602
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+          - time: .31764701
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+          - time: .352941155
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+          - time: 1
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+          preInfinity: 2
+          postInfinity: 2
       events: []
       transformMask: []
       maskType: 0
@@ -260,9 +291,9 @@ ModelImporter:
       loop: 0
       loopTime: 0
       loopBlend: 0
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
-      loopBlendPositionXZ: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0

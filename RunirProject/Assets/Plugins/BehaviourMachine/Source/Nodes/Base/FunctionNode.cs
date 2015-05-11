@@ -10,8 +10,12 @@ namespace BehaviourMachine {
 
     /// <summary> 
     /// A FunctionNode waits for a callback to tick their children.
+    /// Use this node to create your own callbacks, you can call BehaviourTree.TickFunction(\"MyCustomFunctionNAme\") by code or use the TickFunction node.
     /// </summary>
-    public abstract class FunctionNode : CompositeNode {
+    [NodeInfo(  category = "Function/",
+                icon = "Function",
+                description = "Use this node to create your own callbacks, you can call BehaviourTree.TickFunction(\"MyCustomFunctionNAme\") by code or use the TickFunction node.")]
+    public class FunctionNode : CompositeNode {
 
         #region Members
         /// <summary>

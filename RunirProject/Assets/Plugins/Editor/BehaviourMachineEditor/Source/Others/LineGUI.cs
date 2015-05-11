@@ -15,7 +15,6 @@ namespace BehaviourMachineEditor {
     public class LineGUI {
         #region OpenGL
         static Material s_LineMaterial;
-        static Texture2D s_ArrowTexture;
 
         /// <summary> 
         /// The material used to draw lines.

@@ -23,7 +23,7 @@ function LateUpdate () {
 		
 		//send speeds to motor to play animations
 		//if(velocity.z < 0) zMax = 1.556;	
-		motor.Move(velocity.x/maxSpeed, velocity.z/maxSpeed, 0.0);
+		motor.Move(velocity.x/maxSpeed, velocity.z/maxSpeed, 0.1);
 
 		//cache the last frame's position	
 		lastPos = transform.position;	

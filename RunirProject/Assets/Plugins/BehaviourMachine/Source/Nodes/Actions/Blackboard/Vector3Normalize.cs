@@ -31,7 +31,7 @@ namespace BehaviourMachine {
             if (variable.isNone)
                 return Status.Error;
 
-            variable.Value.Normalize();
+            variable.Value = variable.Value.normalized;
 
             return Status.Success;
         }

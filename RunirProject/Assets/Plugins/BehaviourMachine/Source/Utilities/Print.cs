@@ -10,17 +10,30 @@ namespace BehaviourMachine {
     /// <summary> 
     /// Class containing methods to print messages on the Unity console.
     /// </summary>
-    public class Print {
+    public static class Print {
 
-        public static readonly string bmStringLogo = "{<b><color=#78a413>b</color></b>}";
+        public static readonly string bmColoredStringLogo = "{<b><color=#78a413>b</color></b>}";
+        public static readonly string bmStringLogo = "{b}";
+
+        /// <summary> 
+        /// Returns the logo for the current platform.
+        /// <returns>The {b} logo.</returns> 
+        /// </summary>
+        public static string GetLogo () {
+            if (Application.platform == RuntimePlatform.OSXEditor)
+                return Print.bmColoredStringLogo;
+            else
+                return Print.bmStringLogo;
+        }
 
         /// <summary> 
         /// Logs message to the Unity Console.
         /// <param name="message">The message to be printed in the console.</param> 
         /// </summary>
         static public void Log (string message) {
-            if (Debug.isDebugBuild)
-                Debug.Log(bmStringLogo + ": " + message);
+            if (Debug.isDebugBuild) {
+                Debug.Log(Print.GetLogo() + ": " + message);
+            }
         }
 
         /// <summary> 
@@ -29,8 +42,9 @@ namespace BehaviourMachine {
         /// <param name="context">An object to be highlighted if you select the message in the console.</param> 
         /// </summary>
         static public void Log (string message, UnityEngine.Object context) {
-            if (Debug.isDebugBuild)
-                Debug.Log(Print.bmStringLogo + ": " + message, context);
+            if (Debug.isDebugBuild) {
+                Debug.Log(Print.GetLogo() + ": " + message, context);
+            }
         }
 
         /// <summary> 
@@ -39,7 +53,7 @@ namespace BehaviourMachine {
         /// </summary>
         static public void LogWarning (string message) {
             if (Debug.isDebugBuild)
-                Debug.LogWarning(Print.bmStringLogo + ": " + message);
+                Debug.LogWarning(Print.GetLogo() + ": " + message);
         }
 
         /// <summary> 
@@ -49,7 +63,7 @@ namespace BehaviourMachine {
         /// </summary>
         static public void LogWarning (string message, UnityEngine.Object context) {
             if (Debug.isDebugBuild)
-                Debug.LogWarning(Print.bmStringLogo + ": " + message, context);
+                Debug.LogWarning(Print.GetLogo() + ": " + message, context);
         }
 
         /// <summary> 
@@ -58,7 +72,7 @@ namespace BehaviourMachine {
         /// </summary>
         static public void LogError (string message) {
             if (Debug.isDebugBuild)
-                Debug.LogError(Print.bmStringLogo + ": " + message);
+                Debug.LogError(Print.GetLogo() + ": " + message);
         }
 
         /// <summary> 
@@ -68,7 +82,7 @@ namespace BehaviourMachine {
         /// </summary>
         static public void LogError (string message, UnityEngine.Object context) {
             if (Debug.isDebugBuild)
-                Debug.LogError(Print.bmStringLogo + ": " + message, context);
+                Debug.LogError(Print.GetLogo() + ": " + message, context);
         }
     }
 }

@@ -61,7 +61,7 @@ namespace BehaviourMachineEditor {
         /// </summary>
         class Styles {
             public readonly GUIStyle foldout = "IN Foldout";
-            public readonly GUIStyle insertion = "PR Insertion";
+            public readonly GUIStyle insertion = new GUIStyle("PR Insertion");
             public readonly GUIStyle label = new GUIStyle("PR Label");
             public readonly GUIStyle hiLabel = "HI Label";
             public readonly GUIStyle ping = new GUIStyle("PR Ping");
@@ -71,7 +71,12 @@ namespace BehaviourMachineEditor {
             public readonly Color textColor;
 
             public Styles() {
+                // insertion.richText = true;
+                label.richText = true;
+
                 textColor = label.normal.textColor;
+
+                ping.richText = true;
                 ping.padding.top -= 1;
                 ping.padding.bottom -= 1;
             }
@@ -831,7 +836,7 @@ namespace BehaviourMachineEditor {
                             break;
                     }
                 }
-                // This is the highlight node and the last mouse click was in this behaviour?
+                // This is the highlight node and the last mouse clicked was in this behaviour?
                 else if (on && m_LastClickedID == nodeId) {
                     // Start drag operation?
                     if (current.type == EventType.MouseDrag) {
@@ -867,7 +872,7 @@ namespace BehaviourMachineEditor {
                 case EventType.DragUpdated:
                     if (m_DropDrag.SetDrop(null, false) && !Application.isPlaying)
                         Repaint();
-                    // Shows a link icon in the cursor
+                    // Shows a link icon on the cursor
                     DragAndDrop.visualMode = DragAndDropVisualMode.Link;
                     break;
                 // Clear selection?
@@ -895,7 +900,6 @@ namespace BehaviourMachineEditor {
                 // Perform a drag operation?
                 case EventType.DragPerform:
                     // Do drag
-
                     m_LastClickedID = 0;
 
                     // The dragged node is not null and the active tree contains this node
@@ -966,12 +970,12 @@ namespace BehaviourMachineEditor {
                                     BehaviourWindow.activeNodeID = newNode.instanceID;
 
                                     // Clear Drag And Drop
-                                    DragAndDrop.paths = new string[0];
-                                    DragAndDrop.objectReferences = new UnityEngine.Object[] {};
+                                    // DragAndDrop.paths = new string[0];
+                                    // DragAndDrop.objectReferences = new UnityEngine.Object[] {};
                                     DragAndDrop.AcceptDrag();
 
                                     // Use event
-                                    current.Use();
+                                    // current.Use();
 
                                     // Refresh
                                     Refresh();

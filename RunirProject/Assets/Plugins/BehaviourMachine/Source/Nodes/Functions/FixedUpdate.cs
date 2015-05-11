@@ -19,14 +19,14 @@ namespace BehaviourMachine {
 
         public override void OnEnable () {
             if (this.enabled) {
-                owner.fixedUpdate += OnTick;
+                InternalGlobalBlackboard.fixedUpdate += OnTick;
 
                 m_Registered = true;
             }
         }
 
         public override void OnDisable () {
-            owner.fixedUpdate -= OnTick;
+            InternalGlobalBlackboard.fixedUpdate -= OnTick;
 
             m_Registered = false;
         }

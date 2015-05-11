@@ -8,6 +8,14 @@ var targetAngle : float = 60.0;
 //the LayerMask of colliders that can be considered targets (most likely Player)
 var targetLayers : LayerMask;
 
+private var anim : Animator;
+private var blackboard : InternalBlackboard;
+
+function Awake(){
+	anim = GetComponent.<Animator>();
+	blackboard = GetComponent.<InternalBlackboard>();
+}
+
 function CheckForTarget() : GameObject{
 
 	//sweep for target colliders within range
@@ -37,3 +45,10 @@ function CheckForTarget() : GameObject{
 	return target;
 	
 } //eof CheckForTarget()
+
+function OnAnimatorIK(){
+	if(anim.avatar.isHuman && blackboard.GetGameObjectVar("target").Value){
+		anim.SetLookAtWeight(1.0, 0.4, 0.75, 0.0, 0.5);
+		anim.SetLookAtPosition(blackboard.GetGameObjectVar("target").Value.transform.position + Vector3.up*2.0);	
+	}
+}

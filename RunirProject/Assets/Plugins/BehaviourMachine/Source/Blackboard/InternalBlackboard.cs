@@ -83,6 +83,9 @@ namespace BehaviourMachine {
         ConcreteObjectVar[] m_ObjectVars = new ConcreteObjectVar[0];
         [HideInInspector]
         [SerializeField]
+        ConcreteDynamicList[] m_DynamicLists = new ConcreteDynamicList[0];
+        [HideInInspector]
+        [SerializeField]
         protected FsmEvent[] m_FsmEvents = new FsmEvent[0];
         [HideInInspector]
         [SerializeField]
@@ -91,7 +94,7 @@ namespace BehaviourMachine {
         protected string m_Namespace;
 
         [System.NonSerialized]
-        List<InternalStateMachine> m_Fsm = new List<InternalStateMachine>();
+        List<ParentBehaviour> m_Parents = new List<ParentBehaviour>();
         #endregion Members
 
         #region Events
@@ -238,6 +241,11 @@ namespace BehaviourMachine {
         /// </summary>
         public event Collider2DCallback onTriggerStay2D; 
         #endif
+
+        /// <summary>
+        /// Sent after a new level was loaded.
+        /// </summary>
+        public event IntegerCallback onLevelWasLoaded;
         #endregion Events
 
         #region Properties
@@ -302,6 +310,11 @@ namespace BehaviourMachine {
         public ObjectVar[] objectVars {get {return m_ObjectVars;}}
 
         /// <summary>
+        /// Returns the DynamicList variables.
+        /// </summary>
+        public DynamicList[] dynamicLists {get {return m_DynamicLists;}}
+
+        /// <summary>
         /// Returns the FsmEvents.
         /// </summary>
         public FsmEvent[] fsmEvents {get {return m_ConcreteFsmEvents;}}
@@ -323,6 +336,7 @@ namespace BehaviourMachine {
                 variables.AddRange(this.textureVars);
                 variables.AddRange(this.materialVars);
                 variables.AddRange(this.objectVars);
+                variables.AddRange(this.dynamicLists);
                 variables.AddRange(this.fsmEvents);
                 return variables.ToArray();
             }
@@ -345,6 +359,7 @@ namespace BehaviourMachine {
                         m_TextureVars.Length == 0 &&
                         m_MaterialVars.Length == 0 &&
                         m_ObjectVars.Length == 0 &&
+                        m_DynamicLists.Length == 0 &&
                         m_ConcreteFsmEvents.Length == 0;
             }
         }
@@ -411,6 +426,11 @@ namespace BehaviourMachine {
         public int GetObjectsSize () {return m_ObjectVars.Length;}
 
         /// <summary>
+        /// Number of ObjectVars in the blackboard. 
+        /// </summary>
+        public int GetDynamicListsSize () {return m_DynamicLists.Length;}
+
+        /// <summary>
         /// Number of FsmEvents in the blackboard. 
         /// </summary>
         public int GetFsmEventsSize () {return m_ConcreteFsmEvents.Length;}
@@ -432,6 +452,7 @@ namespace BehaviourMachine {
                     m_TextureVars.Length +
                     m_MaterialVars.Length +
                     m_ObjectVars.Length +
+                    m_DynamicLists.Length +
                     m_ConcreteFsmEvents.Length;
         }
 
@@ -447,20 +468,20 @@ namespace BehaviourMachine {
         /// Unity callback called when the script instance is being loaded.
         /// Call UpdateHideFlags and SaveLastParent in prefab instances or missing prefabs.
         /// </summary>
-        void Awake () {
+        public virtual void Awake () {
             #if UNITY_EDITOR
             if (InternalBlackboard.onUpdateHideFlag != null)
                 InternalBlackboard.onUpdateHideFlag(this);
             #endif
 
             if (InternalGlobalBlackboard.Instance == null)
-                Print.LogError("You should create a GlobalBlackboard by selecting \"Tools/BehaviourMachine/Global Blackboard\" from the Unity toolbar.");
+                Print.LogWarning("You should create a GlobalBlackboard by selecting \"Tools/BehaviourMachine/Global Blackboard\" from the Unity toolbar.");
         }
 
         /// <summary>
         /// Unity callback for setting up animation IK (inverse kinematics).
         /// </summary>
-        void OnAnimatorIK (int layerIndex) {
+        public virtual void OnAnimatorIK (int layerIndex) {
             if (onAnimatorIK != null)
                 onAnimatorIK(layerIndex);
         }
@@ -468,7 +489,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback sent to all game objects when the player gets or loses focus.
         /// </summary>
-        void OnApplicationFocus () {
+        public virtual void OnApplicationFocus () {
             #if UNITY_EDITOR
             if (!Application.isPlaying)
                 return;
@@ -483,7 +504,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback sent to all game objects when the player pauses.
         /// </summary>
-        void OnApplicationPause (bool pauseStatus) {
+        public virtual void OnApplicationPause (bool pauseStatus) {
             #if UNITY_EDITOR
             if (!Application.isPlaying)
                 return;
@@ -498,7 +519,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback sent to all game objects before the application quits.
         /// </summary>
-        void OnApplicationQuit () {
+        public virtual void OnApplicationQuit () {
             #if UNITY_EDITOR
             if (!Application.isPlaying)
                 return;
@@ -513,7 +534,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when the renderer is no longer visible by any camera.
         /// </summary>
-        void OnBecameInvisible () {
+        public virtual void OnBecameInvisible () {
             SendEvent(-4);
 
             if (onBecameInvisible != null)
@@ -523,7 +544,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when the renderer became visible by any camera.
         /// </summary>
-        void OnBecameVisible () {
+        public virtual void OnBecameVisible () {
             SendEvent(-5);
 
             if (onBecameVisible != null)
@@ -533,7 +554,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when this collider/rigidbody has begun touching another rigidbody/collider.
         /// </summary>
-        void OnCollisionEnter (Collision collision) {
+        public virtual void OnCollisionEnter (Collision collision) {
             SendEvent(-6);
 
             if (onCollisionEnter != null)
@@ -544,7 +565,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when this collider/rigidbody has begun touching another rigidbody/collider (2D physics only).
         /// </summary>
-        void OnCollisionEnter2D (Collision2D collision) {
+        public virtual void OnCollisionEnter2D (Collision2D collision) {
             SendEvent(-7);
 
             if (onCollisionEnter2D != null)
@@ -555,7 +576,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when this collider/rigidbody has stopped touching another rigidbody/collider.
         /// </summary>
-        void OnCollisionExit (Collision collision) {
+        public virtual void OnCollisionExit (Collision collision) {
             SendEvent(-8);
 
             if (onCollisionExit != null)
@@ -566,7 +587,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when this collider/rigidbody has stopped touching another rigidbody/collider (2D physics only).
         /// </summary>
-        void OnCollisionExit2D (Collision2D collision) {
+        public virtual void OnCollisionExit2D (Collision2D collision) {
             SendEvent(-9);
 
             if (onCollisionExit2D != null)
@@ -577,7 +598,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called once per frame for every collider/rigidbody that is touching rigidbody/collider.
         /// </summary>
-        void OnCollisionStay (Collision collision) {
+        public virtual void OnCollisionStay (Collision collision) {
             if (onCollisionStay != null)
                 onCollisionStay(collision);
         }
@@ -586,7 +607,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called once per frame for every collider/rigidbody that is touching rigidbody/collider (2D physics only).
         /// </summary>
-        void OnCollisionStay2D (Collision2D collision) {
+        public virtual void OnCollisionStay2D (Collision2D collision) {
             if (onCollisionStay2D != null)
                 onCollisionStay2D(collision);
         }
@@ -595,7 +616,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when the controller hits a collider while performing a Move.
         /// </summary>
-        void OnControllerColliderHit (ControllerColliderHit hit) {            
+        public virtual void OnControllerColliderHit (ControllerColliderHit hit) {            
             if (onControllerColliderHit != null)
                 onControllerColliderHit(hit);
         }
@@ -603,7 +624,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called to draw gizmos.
         /// </summary>
-        void OnDrawGizmos () {
+        public virtual void OnDrawGizmos () {
             if (onDrawGizmos != null)
                 onDrawGizmos();
         }
@@ -611,7 +632,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when a joint attached to the same game object broke.
         /// </summary>
-        void OnJointBreak (float breakForce) {
+        public virtual void OnJointBreak (float breakForce) {
             SendEvent(-11);
 
             if (onJointBreak != null)
@@ -621,7 +642,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when the user has clicked on a GUIElement or Collider and is still holding down the mouse.
         /// </summary>
-        void OnMouseDrag () {
+        public virtual void OnMouseDrag () {
             if (onMouseDrag != null)
                 onMouseDrag();
         }
@@ -629,7 +650,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when the mouse entered the GUIElement or Collider.
         /// </summary>
-        void OnMouseEnter () {
+        public virtual void OnMouseEnter () {
             SendEvent(-12);
 
             if (onMouseEnter != null)
@@ -639,7 +660,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when the mouse is not any longer over the GUIElement or Collider.
         /// </summary>
-        void OnMouseExit () {
+        public virtual void OnMouseExit () {
             SendEvent(-13);
 
             if (onMouseExit != null)
@@ -649,7 +670,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when the user has pressed the mouse button while over the GUIElement or Collider.
         /// </summary>
-        void OnMouseDown () {
+        public virtual void OnMouseDown () {
             SendEvent(-14);
 
             if (onMouseDown != null)
@@ -659,7 +680,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called every frame while the mouse is over the GUIElement or Collider.
         /// </summary>
-        void OnMouseOver () {
+        public virtual void OnMouseOver () {
             if (onMouseOver != null)
                 onMouseOver();
         }
@@ -667,7 +688,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when the user has released the mouse button.
         /// </summary>
-        void OnMouseUp () {
+        public virtual void OnMouseUp () {
             SendEvent(-15);
 
             if (onMouseUp != null)
@@ -677,7 +698,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when the mouse is released over the same GUIElement or Collider as it was pressed.
         /// </summary>
-        void OnMouseUpAsButton () {
+        public virtual void OnMouseUpAsButton () {
             SendEvent(-16);
 
             if (onMouseUpAsButton != null)
@@ -687,7 +708,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when the Collider other enters the trigger.
         /// </summary>
-        void OnTriggerEnter (Collider other) {
+        public virtual void OnTriggerEnter (Collider other) {
             SendEvent(-17);
 
             if (onTriggerEnter != null)
@@ -698,7 +719,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when the Collider other enters the trigger (2D physics only).
         /// </summary>
-        void OnTriggerEnter2D (Collider2D other) {
+        public virtual void OnTriggerEnter2D (Collider2D other) {
             SendEvent(-18);
 
             if (onTriggerEnter2D != null)
@@ -709,7 +730,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when the Collider other has stopped touching the trigger.
         /// </summary>
-        void OnTriggerExit (Collider other) {
+        public virtual void OnTriggerExit (Collider other) {
             SendEvent(-19);
 
             if (onTriggerExit != null)
@@ -720,7 +741,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called when the Collider other has stopped touching the trigger (2D physics only).
         /// </summary>
-        void OnTriggerExit2D (Collider2D other) {
+        public virtual void OnTriggerExit2D (Collider2D other) {
             SendEvent(-20);
             
             if (onTriggerExit2D != null)
@@ -731,7 +752,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called once per frame for every Collider other that is touching the trigger.
         /// </summary>
-        void OnTriggerStay (Collider other) {          
+        public virtual void OnTriggerStay (Collider other) {          
             if (onTriggerStay != null)
                 onTriggerStay(other);
         }
@@ -740,38 +761,49 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity callback called once per frame for every Collider other that is touching the trigger (2D physics only).
         /// </summary>
-        void OnTriggerStay2D (Collider2D other) {          
+        public virtual void OnTriggerStay2D (Collider2D other) {          
             if (onTriggerStay2D != null)
                 onTriggerStay2D(other);
         }
         #endif
+
+        /// <summary>
+        /// Unity callback called after a new level was loaded.
+        /// <param name="level">The index of the level that was loaded.</param>
+        /// </summary>
+        public virtual void OnLevelWasLoaded (int level) {
+            SendEvent(-21);
+
+            if (onLevelWasLoaded != null)
+                onLevelWasLoaded(level);
+        }
         #endregion Unity Callbacks
 
         
         #region Root Fsm
         /// <summary>
-        /// Returns the enabled root fsms in this game object. 
-        /// <returns>The enabled root FSMs.</returns> 
+        /// Returns the enabled root parents (StateMachines/BehaviourTrees) in this game object. 
+        /// <returns>The enabled root StateMachines and BehaviourTrees in this game object.</returns> 
         /// </summary>
-        public List<InternalStateMachine> GetEnabledRootFsms () {
-            return m_Fsm;
+        public ParentBehaviour[] GetEnabledRootParents () {
+            return m_Parents.ToArray();
         }
 
         /// <summary>
         /// Returns the root FSM in this game object that has the supplied name.
-        /// <param name="fsmName">The FSM name to search for.</param> 
+        /// <param name="parentName">The FSM name to search for.</param> 
         /// <returns>The target FSM.</returns> 
         /// </summary>
-        public InternalStateMachine GetRootFSM (string fsmName) {
-            for (int i = 0; i < m_Fsm.Count; i++) {
-                if (m_Fsm[i].stateName == fsmName)
-                    return m_Fsm[i];
+        public ParentBehaviour GetRootParent (string parentName) {
+            for (int i = 0; i < m_Parents.Count; i++) {
+                if (m_Parents[i].stateName == parentName)
+                    return m_Parents[i];
             }
             return null;
         }
 
         /// <summary>
-        /// Call SendEvent on all enabled root FSM in the scene.
+        /// Call SendEvent on all enabled root StateMachines/BehaviourTrees in the scene.
         /// Please note that this function is very slow. It is not recommended to use this function every frame.
         /// <param name="eventName">The name of the event.</param>
         /// <returns>True if the event was used; false otherwise.</returns>
@@ -786,7 +818,7 @@ namespace BehaviourMachine {
         }
 
         /// <summary>
-        /// Call SendEvent on all enabled root FSM in the scene.
+        /// Call SendEvent on all enabled root StateMachines/BehaviourTrees in the scene.
         /// Please note that this function is very slow. It is not recommended to use this function every frame.
         /// <param name="eventID">The id of the event.</param>
         /// <returns>True if the event was used; false otherwise.</returns>
@@ -801,7 +833,7 @@ namespace BehaviourMachine {
         }
 
         /// <summary>
-        /// Call SendEvent on all enabled root FSM in this game object or any of its children.
+        /// Call SendEvent on all enabled root StateMachines/BehaviourTrees in this game object or any of its children.
         /// <param name="eventName">The name of the event.</param>
         /// <returns>True if the event was used; false otherwise.</returns>
         /// </summary>
@@ -818,7 +850,7 @@ namespace BehaviourMachine {
         }
 
         /// <summary>
-        /// Call SendEvent on all enabled root FSM in this game object or any of its children.
+        /// Call SendEvent on all enabled root StateMachines/BehaviourTrees in this game object or any of its children.
         /// <param name="eventID">The id of the event.</param>
         /// <returns>True if the event was used; false otherwise.</returns>
         /// </summary>
@@ -835,7 +867,7 @@ namespace BehaviourMachine {
         }
 
         /// <summary>
-        /// Call SendEvent on all enabled root FSM in this game object and its ancestor.
+        /// Call SendEvent on all enabled root StateMachines/BehaviourTrees in this game object and its ancestor.
         /// <param name="eventName">The name of the event.</param>
         /// <returns>True if the event was used; false otherwise.</returns>
         /// </summary>
@@ -853,7 +885,7 @@ namespace BehaviourMachine {
         }
 
         /// <summary>
-        /// Call SendEvent on all enabled root FSM in this game object and its ancestor.
+        /// Call SendEvent on all enabled root StateMachines/BehaviourTrees in this game object and its ancestor.
         /// <param name="eventID">The id of the event.</param>
         /// <returns>True if the event was used; false otherwise.</returns>
         /// </summary>
@@ -871,33 +903,33 @@ namespace BehaviourMachine {
         }
  
         /// <summary>
-        /// Call SendEvent in the root FSM that has the supplied name.
-        /// <param name="fsmName">The FSM name to change state.</param> 
+        /// Call SendEvent in the root StateMachines/BehaviourTrees that has the supplied name.
+        /// <param name="parentName">The parent name to change state.</param> 
         /// <param name="eventName">The name of the event.</param>
         /// <returns>True if the event was used; false otherwise.</returns>
         /// </summary>
-        public bool SendEvent (string fsmName, string eventName) {
+        public bool SendEvent (string parentName, string eventName) {
             // Get the fsmEvent
             FsmEvent fsmEvent = this.GetFsmEvent(eventName);
             if (fsmEvent == null && InternalGlobalBlackboard.Instance != null && InternalGlobalBlackboard.Instance != this)
                 fsmEvent = InternalGlobalBlackboard.Instance.GetFsmEvent(eventName);
 
-            return fsmEvent != null && SendEvent(fsmName, fsmEvent.id);
+            return fsmEvent != null && SendEvent(parentName, fsmEvent.id);
         }
 
         /// <summary>
-        /// Call SendEvent in the root FSM that has the supplied name.
-        /// <param name="fsmName">The target fsm name.</param>
+        /// Call SendEvent in the root StateMachines/BehaviourTrees that has the supplied name.
+        /// <param name="parentName">The target parent name.</param>
         /// <param name="eventID">The id of the event.</param>
         /// <returns>True if the event was used; false otherwise.</returns>
         /// </summary>
-        public bool SendEvent (string fsmName, int eventID) {
-            InternalStateMachine fsm = GetRootFSM(fsmName);
-            return fsm != null && fsm.SendEvent(eventID);
+        public bool SendEvent (string parentName, int eventID) {
+            ParentBehaviour parent = GetRootParent(parentName);
+            return parent != null && parent.SendEvent(eventID);
         }
 
         /// <summary>
-        /// Call SendEvent on all enabled root FSM.
+        /// Call SendEvent on all enabled root StateMachines/BehaviourTrees.
         /// <param name="eventName">The name of the event.</param>
         /// <returns>True if the event was used; false otherwise.</returns>
         /// </summary>
@@ -911,7 +943,7 @@ namespace BehaviourMachine {
         }
 
         /// <summary>
-        /// Call SendEvent on all enabled root FSM.
+        /// Call SendEvent on all enabled root StateMachines/BehaviourTrees.
         /// <param name="eventName">The name of the event.</param>
         /// </summary>
         public void SendEventTrigger (string eventName) {
@@ -925,8 +957,8 @@ namespace BehaviourMachine {
         /// </summary>
         public bool SendEvent (int eventID) {
             bool eventUsed = false;
-            for (int i = 0; i < m_Fsm.Count; i++)
-                eventUsed = m_Fsm[i].SendEvent(eventID) || eventUsed;
+            for (int i = 0; i < m_Parents.Count; i++)
+                eventUsed = m_Parents[i].SendEvent(eventID) || eventUsed;
             return eventUsed;
         }
 
@@ -940,24 +972,24 @@ namespace BehaviourMachine {
 
         /// <summary>
         /// Adds a new root fsm to this blackboard.
-        /// Automatically called by fsms.
-        /// The fsm should be a root parent, enabled and in the same game object as this blackboard.
-        /// The FSMs will receive all system events in this game object.
-        /// <param name="fsm">The InternalStateMachine to be added to the blackboard.</param>
+        /// Automatically called by StateMachines and BehaviourTrees.
+        /// The parent should be a root parent, enabled and in the same game object as this blackboard.
+        /// The parents will receive all system events in this game object.
+        /// <param name="parent">The parent to be added to the blackboard.</param>
         /// </summary>
-        public void AddRootFsm (InternalStateMachine fsm) {
-            if (fsm != null && fsm.isRoot && fsm.enabled && fsm.gameObject == this.gameObject && !m_Fsm.Contains(fsm))
-            m_Fsm.Add(fsm);
+        public void AddRootParent (ParentBehaviour parent) {
+            if (parent != null && parent.isRoot && parent.enabled && parent.gameObject == this.gameObject && !m_Parents.Contains(parent))
+                m_Parents.Add(parent);
         }
 
         /// <summary>
         /// Removes the supplied fsm from this blackboard.
-        /// Automatically called by fsms.
-        /// <param name="fsm">The InternalStateMachine to be added to the blackboard.</param>
+        /// Automatically called by StateMachines and BehaviourTrees.
+        /// <param name="parent">The parent to be added to the blackboard.</param>
         /// </summary>
-        public void RemoveRootFsm (InternalStateMachine fsm) {
-            if (m_Fsm.Contains(fsm))
-                m_Fsm.Remove(fsm);
+        public void RemoveRootParent (ParentBehaviour parent) {
+            if (m_Parents.Contains(parent))
+                m_Parents.Remove(parent);
         }
         #endregion Root Fsm
 
@@ -1007,6 +1039,9 @@ namespace BehaviourMachine {
             // Object
             for (int i = 0; i < m_ObjectVars.Length; i++)
                 names.Add(m_ObjectVars[i].name);
+            // DynamicList
+            for (int i = 0; i < m_DynamicLists.Length; i++)
+                names.Add(m_DynamicLists[i].name);
             // FsmEvent
             for (int i = 0; i < m_ConcreteFsmEvents.Length; i++)
                 names.Add(m_ConcreteFsmEvents[i].name);
@@ -1179,6 +1214,20 @@ namespace BehaviourMachine {
             for (int i = 0; i < m_ObjectVars.Length; i++) {
                 if (m_ObjectVars[i].name == name)
                     return m_ObjectVars[i];
+            }
+
+            return null;
+        }
+
+        /// <summary> 
+        /// Returns a DynamicLists variable.
+        /// <param name="name">The name of the variable.</param>
+        /// <returns>The DynamicList variable that has the supplied name.</returns>
+        /// </summary>
+        public DynamicList GetDynamicList (string name) {
+            for (int i = 0; i < m_DynamicLists.Length; i++) {
+                if (m_DynamicLists[i].name == name)
+                    return m_DynamicLists[i];
             }
 
             return null;
@@ -1367,6 +1416,20 @@ namespace BehaviourMachine {
         }
 
         /// <summary> 
+        /// Returns a DynamicList.
+        /// <param name="id">The id of the variable.</param>
+        /// <returns>The DynamicList that has the supplied id.</returns>
+        /// </summary>
+        public DynamicList GetDynamicList (int id) {
+            for (int i = 0; i < m_DynamicLists.Length; i++) {
+                if (m_DynamicLists[i].id == id)
+                    return m_DynamicLists[i];
+            }
+
+            return null;
+        }
+
+        /// <summary> 
         /// Returns a FsmEvent.
         /// <param name="id">The id of the fsmEvent.</param>
         /// <returns>The FsmEvent variable that has the supplied id.</returns>
@@ -1387,55 +1450,118 @@ namespace BehaviourMachine {
         /// </summary>
         public List<Variable> GetVariables (System.Type type) {
             List<Variable> variables = new List<Variable>();
+
+            // Float
             if (type == typeof(FloatVar)) {
                 for (int i = 0; i < m_FloatVars.Length; i++)
                     variables.Add(m_FloatVars[i]);
             }
+            // Int
             else if (type == typeof(IntVar)) {
                 for (int i = 0; i < m_IntVars.Length; i++)
                     variables.Add(m_IntVars[i]);
             }
+            // Bool
             else if (type == typeof(BoolVar)) {
                 for (int i = 0; i < m_BoolVars.Length; i++)
                     variables.Add(m_BoolVars[i]);
             }
+            // String
             else if (type == typeof(StringVar)) {
                 for (int i = 0; i < m_StringVars.Length; i++)
                     variables.Add(m_StringVars[i]);
             }
+            // Vector3
             else if (type == typeof(Vector3Var)) {
                 for (int i = 0; i < m_Vector3Vars.Length; i++)
                     variables.Add(m_Vector3Vars[i]);
             }
+            // Rect
             else if (type == typeof(RectVar)) {
                 for (int i = 0; i < m_RectVars.Length; i++)
                     variables.Add(m_RectVars[i]);
             }
+            // Color
             else if (type == typeof(ColorVar)) {
                 for (int i = 0; i < m_ColorVars.Length; i++)
                     variables.Add(m_ColorVars[i]);
             }
+            // Quaternion
             else if (type == typeof(QuaternionVar)) {
                 for (int i = 0; i < m_QuaternionVars.Length; i++)
                     variables.Add(m_QuaternionVars[i]);
             }
+            // GameObject
             else if (type == typeof(GameObjectVar)) {
                 for (int i = 0; i < m_GameObjectVars.Length; i++)
                     variables.Add(m_GameObjectVars[i]);
             }
+            // Texture
             else if (type == typeof(TextureVar)) {
                 for (int i = 0; i < m_TextureVars.Length; i++)
                     variables.Add(m_TextureVars[i]);
             }
+            // Material
             else if (type == typeof(MaterialVar)) {
                 for (int i = 0; i < m_MaterialVars.Length; i++)
                     variables.Add(m_MaterialVars[i]);
             }
+            // Object
             else if (type == typeof(ObjectVar)) {
                 for (int i = 0; i < m_ObjectVars.Length; i++)
                     variables.Add(m_ObjectVars[i]);
             }
+            // DynamicList
+            else if (type == typeof(DynamicList)) {
+                for (int i = 0; i < m_DynamicLists.Length; i++)
+                    variables.Add(m_DynamicLists[i]);
+            }
+            // FsmEvent
             else if (type == typeof(FsmEvent)) {
+                for (int i = 0; i < m_ConcreteFsmEvents.Length; i++)
+                    variables.Add(m_ConcreteFsmEvents[i]);
+            }
+            else if (type == typeof(Variable)) {
+                // Float
+                for (int i = 0; i < m_FloatVars.Length; i++)
+                    variables.Add(m_FloatVars[i]);
+                // Int
+                for (int i = 0; i < m_IntVars.Length; i++)
+                    variables.Add(m_IntVars[i]);
+                // Bool
+                for (int i = 0; i < m_BoolVars.Length; i++)
+                    variables.Add(m_BoolVars[i]);
+                // String
+                for (int i = 0; i < m_StringVars.Length; i++)
+                    variables.Add(m_StringVars[i]);
+                // Vector3
+                for (int i = 0; i < m_Vector3Vars.Length; i++)
+                    variables.Add(m_Vector3Vars[i]);
+                // Rect
+                for (int i = 0; i < m_RectVars.Length; i++)
+                    variables.Add(m_RectVars[i]);
+                // Color
+                for (int i = 0; i < m_ColorVars.Length; i++)
+                    variables.Add(m_ColorVars[i]);
+                // Quaternion
+                for (int i = 0; i < m_QuaternionVars.Length; i++)
+                    variables.Add(m_QuaternionVars[i]);
+                // GameObject
+                for (int i = 0; i < m_GameObjectVars.Length; i++)
+                    variables.Add(m_GameObjectVars[i]);
+                // Texture
+                for (int i = 0; i < m_TextureVars.Length; i++)
+                    variables.Add(m_TextureVars[i]);
+                // Material
+                for (int i = 0; i < m_MaterialVars.Length; i++)
+                    variables.Add(m_MaterialVars[i]);
+                // Object
+                for (int i = 0; i < m_ObjectVars.Length; i++)
+                    variables.Add(m_ObjectVars[i]);
+                // DynamicList
+                for (int i = 0; i < m_DynamicLists.Length; i++)
+                    variables.Add(m_DynamicLists[i]);
+                // FsmEvent
                 for (int i = 0; i < m_ConcreteFsmEvents.Length; i++)
                     variables.Add(m_ConcreteFsmEvents[i]);
             }
@@ -1698,6 +1824,25 @@ namespace BehaviourMachine {
         }
 
         /// <summary>
+        /// Adds a new DynamicList to the blackboard.
+        /// <returns>The new variable.</returns>
+        /// </summary> 
+        public DynamicList AddDynamicList () {
+            // Get a new id
+            var newId = GetUniqueID();
+            // Creates the variable
+            var dynamicList = new ConcreteDynamicList("New Dynamic List", this, newId);
+            // Create the list
+            var dynamicListList = new List<ConcreteDynamicList>(m_DynamicLists);
+            // Add variable to the list
+            dynamicListList.Add(dynamicList);
+            // Create a new array
+            m_DynamicLists = dynamicListList.ToArray();
+            // Return the new variable
+            return dynamicList;
+        }
+
+        /// <summary>
         /// Adds a new FsmEvent to the blackboard.
         /// <returns>The new fsmEvent.</returns>
         /// </summary> 
@@ -1900,6 +2045,21 @@ namespace BehaviourMachine {
         }
 
         /// <summary>
+        /// Removes a DynamicList from the blackboard.
+        /// <param name="i">The dynamic list index to be removed.</param>
+        /// </summary> 
+        public void RemoveDynamicList (int i) {
+            // Set variable as invalid
+            m_DynamicLists[i].SetAsInvalid();
+            // Create the list
+            var dynamicListList = new List<ConcreteDynamicList>(m_DynamicLists);
+            // Remove variable from list
+            dynamicListList.RemoveAt(i);
+            // Recreate array
+            m_DynamicLists = dynamicListList.ToArray();
+        }
+
+        /// <summary>
         /// Removes a fsmEvent from the blackboard.
         /// <param name="i">The fsmEvent index to be removed.</param>
         /// </summary> 
@@ -2070,6 +2230,19 @@ namespace BehaviourMachine {
                         if (m_ObjectVars[i] == variable) {
                             // Remove variable
                             this.RemoveObjectVar(i);
+                            break;
+                        }
+                    }
+                    return;
+                }
+                // DynamicList
+                else if (variable is ConcreteDynamicList) {
+                    // Searchs for the variable index
+                    for (int i = 0; i < m_DynamicLists.Length; i++) {
+                        // The variable has the current index?
+                        if (m_DynamicLists[i] == variable) {
+                            // Remove variable
+                            this.RemoveDynamicList(i);
                             break;
                         }
                     }

@@ -41,11 +41,13 @@ namespace BehaviourMachine {
                         if (InternalGlobalBlackboard.s_Instance == null) {
                             var prefab = Resources.Load("GlobalBlackboard") as GameObject;
                             // Instantiate or create global object
-                            if (prefab != null)
+                            if (prefab != null) {
                                 prefab = Instantiate(prefab) as GameObject;
-                            else
-                                prefab = new GameObject("GlobalBlackboard", typeof(InternalGlobalBlackboard));
-                            InternalGlobalBlackboard.s_Instance = prefab != null ? prefab.GetComponent<InternalGlobalBlackboard>() : null;
+                                InternalGlobalBlackboard.s_Instance = prefab != null ? prefab.GetComponent<InternalGlobalBlackboard>() : null;
+                            }
+                            // else
+                            //     prefab = new GameObject("GlobalBlackboard", typeof(InternalGlobalBlackboard));
+                            // InternalGlobalBlackboard.s_Instance = prefab != null ? prefab.GetComponent<InternalGlobalBlackboard>() : null;
                         }
                     }
                     return InternalGlobalBlackboard.s_Instance;
@@ -63,6 +65,16 @@ namespace BehaviourMachine {
 		}
 		#endregion Singleton
 
+
+        #region RealDeltaTime
+        static float s_LastRealTime = 0f;
+
+        /// <summary>
+        /// The real delta time.
+        /// </summary>
+        public static float realDeltaTime {get {return Time.realtimeSinceStartup - s_LastRealTime;}}
+        #endregion RealDeltaTime
+
         
         #region Create GUICallback
         static bool s_CreateGUICallback;
@@ -78,6 +90,14 @@ namespace BehaviourMachine {
                 s_CreateGUICallback = true;
         }
         #endregion Create GUICallback
+
+
+        #region Events
+        /// <summary>
+        /// Unity timed events.
+        /// </summary>
+        public static event SimpleCallback fixedUpdate, update, lateUpdate;
+        #endregion Events
 
 		
         #region Members
@@ -164,7 +184,8 @@ namespace BehaviourMachine {
 			AddSystemEvent("TRIGGER_ENTER", -17);
 			AddSystemEvent("TRIGGER_ENTER_2D", -18);
 			AddSystemEvent("TRIGGER_EXIT", -19);
-			AddSystemEvent("TRIGGER_EXIT_2D", -20);
+            AddSystemEvent("TRIGGER_EXIT_2D", -20);
+            AddSystemEvent("LEVEL_LOADED", -21);
 		}
 
         /// <summary>
@@ -181,6 +202,50 @@ namespace BehaviourMachine {
             if (s_CreateGUICallback)
                 CreateGUICallbackIfNotExist();
 		}
+
+        /// <summary>
+        /// Update is called every frame.
+        /// Call Update nodes.
+        /// </summary>
+        void Update () {
+            #if UNITY_EDITOR
+            if (!Application.isPlaying)
+                return;
+            #endif
+
+            if (update != null)
+                update();
+        }
+
+        /// <summary>
+        /// FixedUpdate is called every fixed framerate.
+        /// Call FixedUpdate nodes.
+        /// </summary>
+        void FixedUpdate () {
+            #if UNITY_EDITOR
+            if (!Application.isPlaying)
+                return;
+            #endif
+
+            if (fixedUpdate != null)
+                fixedUpdate();
+        }
+
+        /// <summary>
+        /// FixedUpdate is called every frame just before Update.
+        /// Call LateUpdate nodes.
+        /// </summary>
+        void LateUpdate () {
+            #if UNITY_EDITOR
+            if (!Application.isPlaying)
+                return;
+            #endif
+
+            if (lateUpdate != null)
+                lateUpdate();
+
+            s_LastRealTime = Time.realtimeSinceStartup;
+        }
 		#endregion Unity Callbacks
 		
 		/// <summary>

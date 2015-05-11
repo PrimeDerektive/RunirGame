@@ -25,7 +25,7 @@ namespace BehaviourMachineEditor {
         /// </summary>
         class Styles {
             public readonly GUIStyle label;
-            public GUIContent logoContent = new GUIContent(Print.bmStringLogo);
+            public GUIContent logoContent = new GUIContent(Print.bmColoredStringLogo);
 
             public Styles () {
                 label = new GUIStyle ("Label");

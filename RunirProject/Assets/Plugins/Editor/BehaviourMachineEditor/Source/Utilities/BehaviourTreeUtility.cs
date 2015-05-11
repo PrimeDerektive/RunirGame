@@ -38,7 +38,14 @@ namespace BehaviourMachineEditor {
             foreach (var type in TypeUtility.GetDerivedTypes(typeof(ActionNode))) {
                 if (type != null) {
                     var nodeInfo = AttributeUtility.GetAttribute<NodeInfoAttribute>(type, false) ?? new NodeInfoAttribute();
-                    categoryNodeScript.Add(nodeInfo.category + type.Name, type);
+                    string key = nodeInfo.category + type.Name;
+                    // The node was already added?
+                    if (categoryNodeScript.ContainsKey(key)) {
+                        Print.LogWarning("You have more than one \'" + type.Name + "\' node script. You should have only one copy of each node script. Please, search for them in the ProjectView and then delete its copies", null);
+                    }
+                    else {
+                        categoryNodeScript.Add(key, type);
+                    }
                 }
             }
 

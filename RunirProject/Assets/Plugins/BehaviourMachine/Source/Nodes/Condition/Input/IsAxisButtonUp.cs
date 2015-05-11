@@ -94,11 +94,11 @@ namespace BehaviourMachine {
         }
 
         public override void OnEnable () {
-            owner.update += this.MyUpdate;
+            InternalGlobalBlackboard.update += this.MyUpdate;
         }
 
         public override void OnDisable () {
-            owner.update -= this.MyUpdate;
+            InternalGlobalBlackboard.update -= this.MyUpdate;
             isButton = false;
             isButtonUp = false;
         }

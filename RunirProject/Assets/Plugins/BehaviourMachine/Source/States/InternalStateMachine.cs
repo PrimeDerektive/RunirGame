@@ -142,16 +142,16 @@ namespace BehaviourMachine {
         /// <returns>Returns True if the event was used; false otherwise.</returns>
         /// </summary>
         public override bool ProcessEvent (int eventID) {
-            // Tries itself
+            // Try itself
             if (base.ProcessEvent(eventID))
                 return true;
-            // Tries the AnyState
+            // Try the AnyState
             else if (m_AnyState != null && m_AnyState.ProcessEvent(eventID))
                 return true;
-            // Tries the ConcurrentState
+            // Try the ConcurrentState
             else if (m_ConcurrentState != null && m_ConcurrentState.ProcessEvent(eventID))
                 return true;
-            // Tries the enabled state
+            // Try the enabled state
             else if (m_EnabledState != null)
                 return m_EnabledState.ProcessEvent(eventID);
             return false; 
@@ -164,15 +164,15 @@ namespace BehaviourMachine {
         /// Unity callback called when the object becomes enabled and active.
         /// Enables the start state, if the start state is null then tries to enable the first one.
         /// </summary>
-        void OnEnable () {
+        public virtual void OnEnable () {
             #if UNITY_EDITOR
             if (!Application.isPlaying)
                 return;
             #endif
 
-            // Add this fsm to the blackboard to receive system events
+            // Add this parent to the blackboard to receive system events
             if (isRoot)
-                blackboard.AddRootFsm(this);
+                blackboard.AddRootParent(this);
 
             // Enable the concurrent state
             if (m_ConcurrentState != null && !m_ConcurrentState.enabled)
@@ -204,15 +204,15 @@ namespace BehaviourMachine {
         /// Unity callback called when the behaviour becomes disabled or inactive.
         /// Disables the start state.
         /// </summary>
-        void OnDisable () {
+        public virtual void OnDisable () {
             #if UNITY_EDITOR
             if (!Application.isPlaying)
                 return;
             #endif
 
-            // Remove from blackboard to not receive system events
+            // Remove this parent from blackboard to not receive system events
             if (isRoot)
-                blackboard.RemoveRootFsm(this);
+                blackboard.RemoveRootParent(this);
 
             // Disable the current enabled state
             if (m_EnabledState != null)

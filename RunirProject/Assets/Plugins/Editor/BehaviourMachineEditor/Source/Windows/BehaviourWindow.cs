@@ -513,11 +513,11 @@ namespace BehaviourMachineEditor {
         /// </summary>
         void OnEnable () {
             // Set window name
-            this.name = "{b} Behaviour";
+            this.name = Print.GetLogo() + " Behaviour";
             // Update singleton instance
             Instance = this;
 
-            // Update NoVisible value
+            // Update NotVisible value
             BehaviourWindow.s_NotVisible = this.m_NotVisible;
 
             // Set playmode state

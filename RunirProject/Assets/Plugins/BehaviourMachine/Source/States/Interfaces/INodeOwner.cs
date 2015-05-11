@@ -30,6 +30,11 @@ namespace  BehaviourMachine {
         /// </summary>
         float deltaTime {get;}
 
+        /// <summary>
+        /// Amount of time to add to deltaTime, usefull for Coroutines.
+        /// </summary>
+        float deltaTimeAmount {get; set;}
+
         /// <summary> 
         /// The parent behaviour.
         /// </summary>
@@ -46,7 +51,7 @@ namespace  BehaviourMachine {
         /// <summary>
         /// Unity timed events.
         /// </summary>
-        event SimpleCallback onEnable, onDisable, start, fixedUpdate, update, lateUpdate, onDestroy;
+        event SimpleCallback onEnable, onDisable, start, /*fixedUpdate, update, lateUpdate,*/ onDestroy;
         #endregion Events
 
         

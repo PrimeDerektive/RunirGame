@@ -43,12 +43,19 @@ namespace BehaviourMachine {
         [VariableInfo(requiredField = false, nullLabel = "Don't Use", tooltip = "Height of the rectangle; overrides Rect.height")]
         public FloatVar height;
 
+        /// <summary>
+        /// If True then the Rect values will be normalized.
+        /// </summary>
+        [VariableInfo(requiredField = false, nullLabel = "Use OnGUI Defaults", tooltip = "If True then the Rect values will be normalized")]
+        public BoolVar normalized;
+
     	public override void Reset () {
             rect = new ConcreteRectVar();
             x = new ConcreteFloatVar();
             y = new ConcreteFloatVar();
             width = new ConcreteFloatVar();
             height = new ConcreteFloatVar();
+            normalized = true;
         }
 
         public Rect GetRect () {
@@ -59,8 +66,17 @@ namespace BehaviourMachine {
             if (!width.isNone) rect1.width = width;
             if (!height.isNone) rect1.height = height;
 
-            // Scale rect
-            rect1.Set(rect1.x / OnGUI.scale, rect1.y / OnGUI.scale, rect1.width / OnGUI.scale, rect1.height / OnGUI.scale);
+            if (!normalized.isNone && normalized.Value) {
+                // Normalize rect
+                rect1.x *= Screen.width;
+                rect1.width *= Screen.width;
+                rect1.y *= Screen.height;
+                rect1.height *= Screen.height;
+            }
+            else {
+                // Scale rect
+                rect1.Set(rect1.x / OnGUI.scale, rect1.y / OnGUI.scale, rect1.width / OnGUI.scale, rect1.height / OnGUI.scale);
+            }
 
             return rect1;
         }

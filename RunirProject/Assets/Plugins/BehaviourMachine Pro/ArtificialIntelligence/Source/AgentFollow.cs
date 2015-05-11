@@ -1,4 +1,9 @@
-﻿using UnityEngine;
+﻿//----------------------------------------------
+//            Behaviour Machine
+// Copyright © 2014 Anderson Campos Cardoso
+//----------------------------------------------
+
+using UnityEngine;
 using System.Collections;
 
 namespace BehaviourMachine {
@@ -23,16 +28,23 @@ namespace BehaviourMachine {
         [VariableInfo(requiredField = false, nullLabel = "Use Self", tooltip = "The game object to be followed")]
         public GameObjectVar target;
 
+        /// <summary>
+        /// The agent's path will be reseted if the value of 'Reset Path' is True.
+        /// </summary>
+        [VariableInfo(requiredField = false, nullLabel = "True", tooltip = "The agent's path will be reseted if the value of 'Reset Path' is True")]
+        public BoolVar resetPath;
+
         [System.NonSerialized]
         NavMeshAgent m_GOAgent = null;
 
         public override void Reset () {
             gameObject = this.self;
             target = this.self;
+            resetPath = new ConcreteBoolVar();
         }
 
         public override void End () {
-            if (m_GOAgent != null && gameObject.Value != null) {
+            if ((resetPath.isNone || resetPath.Value) && m_GOAgent != null && m_GOAgent.hasPath && gameObject.Value != null) {
                 m_GOAgent.ResetPath();
             }
         }

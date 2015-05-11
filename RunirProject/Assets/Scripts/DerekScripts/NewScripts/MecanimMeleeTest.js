@@ -9,6 +9,8 @@ private var audioSource : AudioSource;
 function Start () {
 	anim = GetComponent.<Animator>();
 	audioSource = GetComponent.<AudioSource>();
+	yield WaitForSeconds(5.0);
+	anim.SetTrigger("blockKnockback");
 }
 
 private var fireDownTime : float = 0.0;

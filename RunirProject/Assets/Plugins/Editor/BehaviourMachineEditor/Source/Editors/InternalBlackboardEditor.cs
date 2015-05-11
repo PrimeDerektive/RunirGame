@@ -78,7 +78,7 @@ namespace BehaviourMachineEditor {
                             var scriptPath = EditorUtility.SaveFilePanelInProject("Save Custom Blackboard Script", m_Blackboard.name.Replace(" ", "_") + "Blackboard.cs", "cs", "Please enter the class name of the custom Blackboard");
                             
                             if (!string.IsNullOrEmpty(scriptPath)) {
-                                MonoScript newScript = CodeGenerator.CreateOrEditCustomBlackboard(scriptPath, m_Blackboard);
+                                MonoScript newScript = BlackboardCodeGenerator.CreateOrEditCustomBlackboard(scriptPath, m_Blackboard);
                                 // Validate the newScript
                                 if (newScript != null) {
                                     m_ScriptProperty.objectReferenceValue = newScript;
@@ -94,7 +94,7 @@ namespace BehaviourMachineEditor {
                     }
                     else if (GUILayout.Button(new GUIContent("Update Script", "It will update the file " + script.name + ".cs with the variables in this Blackboard, use this when you have added/removed/renamed a variable in this Blackboard."), GUILayout.MaxWidth(200f))) {
                         var scriptPath = AssetDatabase.GetAssetPath(script.GetInstanceID());
-                        CodeGenerator.CreateOrEditCustomBlackboard(scriptPath, m_Blackboard);
+                        BlackboardCodeGenerator.CreateOrEditCustomBlackboard(scriptPath, m_Blackboard);
                     }
                     GUILayout.FlexibleSpace();
                     EditorGUILayout.EndHorizontal();

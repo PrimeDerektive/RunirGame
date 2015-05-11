@@ -154,7 +154,7 @@ namespace BehaviourMachine {
         /// Unity callback called when the parent will be destroyed.
         /// Workaround to call UpdateHideFlags in states.
         /// </summary>
-        protected virtual void OnDestroy () {
+        public virtual void OnDestroy () {
             #if UNITY_EDITOR
             if (Application.isEditor) {
                 List<InternalStateBehaviour> states = this.states;

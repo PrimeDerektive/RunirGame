@@ -37,7 +37,7 @@ namespace BehaviourMachine {
         ActionNode[] m_Nodes;
 
         [System.NonSerialized]
-        float m_LastRealTime = 0f;
+        float m_DeltaTimeAmount = 0f;
 
         [System.NonSerialized]
         OnEnable m_OnEnable;
@@ -54,10 +54,9 @@ namespace BehaviourMachine {
         [System.NonSerialized]
         bool m_IsDirty = false;
 
-        [System.NonSerialized]
-        bool m_NodesEnabled = false;
+        bool m_NodesWaked = false;
 
-        bool m_IsPrefab = true;
+        bool m_NodesEnabled = false;
         #endregion Members
     	
 
@@ -75,7 +74,12 @@ namespace BehaviourMachine {
         /// <summary>
         /// If ignoreTimeScale is true then returns the real delta time; otherwise returns Time.deltaTime.
         /// </summary>
-        public float deltaTime {get {return m_IgnoreTimeScale ? Time.realtimeSinceStartup - m_LastRealTime : Time.deltaTime;}}
+        public float deltaTime {get {return m_IgnoreTimeScale ? InternalGlobalBlackboard.realDeltaTime + m_DeltaTimeAmount : Time.deltaTime + m_DeltaTimeAmount;}}
+
+        /// <summary>
+        /// Amount of time to add to deltaTime, usefull for Coroutines.
+        /// </summary>
+        public float deltaTimeAmount {get {return m_DeltaTimeAmount;} set {m_DeltaTimeAmount = value;}}
 
         /// <summary>
         /// Returns the state description.
@@ -98,7 +102,7 @@ namespace BehaviourMachine {
         /// <summary>
         /// Unity timed events.
         /// </summary>
-        public event SimpleCallback onEnable, onDisable, start, fixedUpdate, update, lateUpdate, onDestroy;
+        public event SimpleCallback onEnable, onDisable, start, onDestroy;
         #endregion Events
 
         
@@ -208,11 +212,33 @@ namespace BehaviourMachine {
             }
         }
 
+
         #region Node Callbacks
+        /// <summary>
+        /// Call the Awake method in nodes.
+        /// </summary>
+        void WakeNodes () {
+            m_NodesWaked = true;
+
+            if (m_OnEnable != null)
+                m_OnEnable.Awake();
+            if (m_Update != null)
+                m_Update.Awake();
+            if (m_FixedUpdate != null)
+                m_FixedUpdate.Awake();
+            if (m_OnGUI != null)
+                m_OnGUI.Awake();
+
+            for (int i = 0; i < m_Nodes.Length; i++)
+                m_Nodes[i].Awake();
+        }
+
         /// <summary>
         /// Call the OnEnable method in nodes.
         /// </summary>
         void OnEnableNodes () {
+            m_NodesEnabled = true;
+
             // Call OnEnable in function nodes
             if (m_OnEnable != null)
                 m_OnEnable.OnEnable();
@@ -228,8 +254,6 @@ namespace BehaviourMachine {
                 for (int i = 0; i < m_Nodes.Length; i++)
                     m_Nodes[i].OnEnable();
             }
-
-            m_NodesEnabled = true;
         }
 
         /// <summary>
@@ -306,24 +330,25 @@ namespace BehaviourMachine {
         /// Unity callback called when the script instance is being loaded.
         /// Check link hideFlags. Only used in editor.
         /// </summary>
-        void Awake () {
+        public virtual void Awake () {
             // Load Nodes
-            LoadNodes();
+            if (m_Nodes == null)
+                LoadNodes();
+
+            #if UNITY_EDITOR
+            if (!Application.isPlaying)
+                return;
+            #endif
 
             // Call Awake in nodes
-            // #if UNITY_EDITOR
-            // if (!Application.isPlaying)
-            //     return;
-            // #endif
-
-            m_IsPrefab = false;
+            this.WakeNodes();
         }
 
         /// <summary>
         /// OnEnable is called when the tree becomes enabled and active.
         /// Call OnEnable Nodes.
         /// </summary>
-        void OnEnable () {
+        public virtual void OnEnable () {
             #if UNITY_EDITOR
             if (!Application.isPlaying)
                 return;
@@ -333,11 +358,9 @@ namespace BehaviourMachine {
             if (m_Nodes == null)
                 LoadNodes();
 
-            // Stores last real tme
-            m_LastRealTime = Time.realtimeSinceStartup;
-
             // Call OnEnable in nodes
-            this.OnEnableNodes();
+            if (!m_NodesEnabled)
+                this.OnEnableNodes();
 
             // Call onEnable event
             if (onEnable != null)
@@ -348,7 +371,7 @@ namespace BehaviourMachine {
         /// OnDisable is called when the state becomes disabled or inactive.
         /// Call OnDisable Nodes.
         /// </summary>
-        void OnDisable () {
+        public virtual void OnDisable () {
             #if UNITY_EDITOR
             if (!Application.isPlaying)
                 return;
@@ -362,51 +385,51 @@ namespace BehaviourMachine {
             this.OnDisableNodes();
         }
 
-        /// <summary>
-        /// Update is called every frame, if the tree is enabled.
-        /// Call Update nodes.
-        /// </summary>
-        void Update () {
-            #if UNITY_EDITOR
-            if (!Application.isPlaying)
-                return;
-            #endif
+        // /// <summary>
+        // /// Update is called every frame, if the tree is enabled.
+        // /// Call Update nodes.
+        // /// </summary>
+        // void Update () {
+        //     #if UNITY_EDITOR
+        //     if (!Application.isPlaying)
+        //         return;
+        //     #endif
 
-            // Call update event
-            if (update != null)
-                update();
-        }
+        //     // Call update event
+        //     if (update != null)
+        //         update();
+        // }
 
-        /// <summary>
-        /// FixedUpdate is called every fixed framerate frame, if the tree is enabled.
-        /// Call FixedUpdate nodes.
-        /// </summary>
-        void FixedUpdate () {
-            #if UNITY_EDITOR
-            if (!Application.isPlaying)
-                return;
-            #endif
+        // /// <summary>
+        // /// FixedUpdate is called every fixed framerate frame, if the tree is enabled.
+        // /// Call FixedUpdate nodes.
+        // /// </summary>
+        // void FixedUpdate () {
+        //     #if UNITY_EDITOR
+        //     if (!Application.isPlaying)
+        //         return;
+        //     #endif
 
-            // Call fixedUpdate event
-            if (fixedUpdate != null)
-                fixedUpdate();
-        }
+        //     // Call fixedUpdate event
+        //     if (fixedUpdate != null)
+        //         fixedUpdate();
+        // }
 
-        /// <summary>
-        /// FixedUpdate is called every frame just before Update, if the tree is enabled.
-        /// </summary>
-        void LateUpdate () {
-            #if UNITY_EDITOR
-            if (!Application.isPlaying)
-                return;
-            #endif
+        // /// <summary>
+        // /// FixedUpdate is called every frame just before Update, if the tree is enabled.
+        // /// </summary>
+        // void LateUpdate () {
+        //     #if UNITY_EDITOR
+        //     if (!Application.isPlaying)
+        //         return;
+        //     #endif
 
-            // Call lateUpdate event
-            if (lateUpdate != null)
-                lateUpdate();
+        //     // Call lateUpdate event
+        //     if (lateUpdate != null)
+        //         lateUpdate();
 
-            m_LastRealTime = Time.realtimeSinceStartup;
-        }
+        //     m_LastRealTime = Time.realtimeSinceStartup;
+        // }
 
         /// <summary>
         /// Unity callback called when the user hits the Reset button in the Inspector's context menu or when adding the component the first time (Editor only).
@@ -558,13 +581,11 @@ namespace BehaviourMachine {
 
             m_IsDirty = false;
 
-            // Call Awake in nodes
-            if (!m_IsPrefab && Application.isPlaying) {
-                for (int i = 0; i < m_Nodes.Length; i++)
-                    m_Nodes[i].Awake();
-            }
+            // Awake nodes?
+            if (m_NodesWaked)
+                this.WakeNodes();
 
-            // Reenabled nodes
+            // Reenabled nodes?
             if (m_NodesEnabled)
                 this.OnEnableNodes();
         }

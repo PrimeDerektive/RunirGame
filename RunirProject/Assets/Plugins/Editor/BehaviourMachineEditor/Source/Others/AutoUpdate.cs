@@ -12,6 +12,7 @@ using System.Linq;
 
 namespace BehaviourMachineEditor {
 
+
     /// <summary> 
     /// Class for auto update BehaviourMachine.
     /// </summary>
@@ -23,6 +24,20 @@ namespace BehaviourMachineEditor {
 
         static AutoUpdate () {
             EditorApplication.update += AutoUpdate.CheckVersion;
+            EditorApplication.update += AutoUpdate.CheckGlobalBlackboard;
+        }
+
+        static void CheckGlobalBlackboard () {    
+            // Remove callback
+            EditorApplication.update -= AutoUpdate.CheckGlobalBlackboard;
+
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                return;
+
+            if (InternalGlobalBlackboard.Instance == null) {
+                EditorApplication.ExecuteMenuItem("Tools/BehaviourMachine/Global Blackboard");
+                Print.Log("No GlobalBlackboard found, creating one...", InternalGlobalBlackboard.Instance);
+            }
         }
 
         static void CheckVersion () {

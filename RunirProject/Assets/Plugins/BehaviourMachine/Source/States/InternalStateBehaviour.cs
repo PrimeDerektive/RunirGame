@@ -453,7 +453,7 @@ namespace BehaviourMachine {
         /// </summary>
         public virtual void OnValidate () {
             // Validate Blackboard
-            if (m_Blackboard == null)
+            if (m_Blackboard == null || m_Blackboard.gameObject != this.gameObject)
                 m_Blackboard = GetComponent<InternalBlackboard>();
                 
             // The component has been copied to a new game object?

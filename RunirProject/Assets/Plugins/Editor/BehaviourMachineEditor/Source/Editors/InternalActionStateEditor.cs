@@ -56,7 +56,7 @@ namespace BehaviourMachineEditor {
         /// </summary>
         private void OnNodeTick (ActionNode node) {
             // The node belongs to the active tree?
-            if (node.owner == m_ActionState && node.status != Status.Ready) {
+            if (node.owner as InternalActionState == m_ActionState && node.status != Status.Ready) {
                 // The node status is already been tracked?
                 if (m_NodeStatusTime.ContainsKey(node.instanceID)) {
                     // Update time
@@ -477,7 +477,7 @@ namespace BehaviourMachineEditor {
                 // Draw node properties
                 if (m_NodeEditor != null) {
                     // Is there an active node?
-                    if (activeNode != null && activeNode.owner == m_ActionState) {
+                    if (activeNode != null && activeNode.owner as InternalActionState == m_ActionState) {
                         // It's an Update node
                         var oldGUIEnabled = GUI.enabled;
                         GUI.enabled = !(activeNode is Update);

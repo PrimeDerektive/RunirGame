@@ -47,12 +47,12 @@ namespace BehaviourMachineEditor {
                 if (s_Styles == null)
                     s_Styles = new GizmoDrawer.Styles();
 
-                // Get root fsm
-                var rootFsms = blackboard.GetEnabledRootFsms();
+                // Get root parents
+                var rootParents = blackboard.GetEnabledRootParents();
                 Camera currentCamera = Camera.current;
 
                 // There is at least one fsm enabled?
-                if (rootFsms.Count <= 0 || currentCamera == null)
+                if (rootParents.Length <= 0 || currentCamera == null)
                     return;
 
                 // The object is visible by the camera?
@@ -62,9 +62,9 @@ namespace BehaviourMachineEditor {
                     return;
 
                 // Get enabled state names
-                string names = rootFsms[0].GetEnabledStateName();
-                for (int i = 1; i < rootFsms.Count; i++)
-                    names += "\n" + rootFsms[i].GetEnabledStateName();
+                string names = rootParents[0].GetEnabledStateName();
+                for (int i = 1; i < rootParents.Length; i++)
+                    names += "\n" + rootParents[i].GetEnabledStateName();
 
                 // Handles.Label has an offset bug when working with styles that are not MiddleLeft, bellow is a workaround to center the text.
                 GUIContent nameContent = new GUIContent(names);

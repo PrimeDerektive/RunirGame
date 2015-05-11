@@ -126,7 +126,7 @@ namespace BehaviourMachineEditor {
 
             var menu = new GenericMenu();
 
-            menu.AddItem(new GUIContent("FLoat"), false, delegate () {BlackboardUtility.AddFloatVar(blackboard);});
+            menu.AddItem(new GUIContent("Float"), false, delegate () {BlackboardUtility.AddFloatVar(blackboard);});
             menu.AddItem(new GUIContent("Int"), false, delegate () {BlackboardUtility.AddIntVar(blackboard);});
             menu.AddItem(new GUIContent("Bool"), false, delegate () {BlackboardUtility.AddBoolVar(blackboard);});
             menu.AddItem(new GUIContent("String"), false, delegate () {BlackboardUtility.AddStringVar(blackboard);});
@@ -138,6 +138,7 @@ namespace BehaviourMachineEditor {
             menu.AddItem(new GUIContent("Texture"), false, delegate () {BlackboardUtility.AddTextureVar(blackboard);});
             menu.AddItem(new GUIContent("Material"), false, delegate () {BlackboardUtility.AddMaterialVar(blackboard);});
             menu.AddItem(new GUIContent("Object"), false, delegate () {BlackboardUtility.AddObjectVar(blackboard);});
+            menu.AddItem(new GUIContent("DynamicList"), false, delegate () {BlackboardUtility.AddDynamicList(blackboard);});
             menu.AddItem(new GUIContent("FsmEvent"), false, delegate () {BlackboardUtility.AddFsmEvent(blackboard);});
             
             if (!(blackboard is InternalGlobalBlackboard)) {
@@ -169,6 +170,7 @@ namespace BehaviourMachineEditor {
                             + blackboard.GetTexturesSize() * c_OneLineHeight
                             + blackboard.GetMaterialsSize() * c_OneLineHeight
                             + blackboard.GetObjectsSize() * c_TwoLinesHeight
+                            + blackboard.GetDynamicListsSize() * c_OneLineHeight
                             + blackboard.GetFsmEventsSize() * c_OneLineHeight;
             return height;
         }
@@ -259,8 +261,13 @@ namespace BehaviourMachineEditor {
                 DrawObjectVar(position, objectVar, isAsset);
                 position.y += position.height;
             }
-            // FsmEvent
+            // DynamicList
             position.height = c_OneLineHeight;
+            foreach (var dynamicList in blackboard.dynamicLists) {
+                DrawDynamicList(position, dynamicList);
+                position.y += position.height;
+            }
+            // FsmEvent
             foreach (var fsmEvent in blackboard.fsmEvents) {
                 DrawFsmEvent(position, fsmEvent);
                 position.y += position.height;
@@ -844,6 +851,31 @@ namespace BehaviourMachineEditor {
             rect.yMax += 2f;
             if (GUI.Button(rect, s_Styles.iconToolbarMinus, s_Styles.invisbleButton))
                 s_VariableToRemove = objectVar;
+        }
+
+        /// <summary> 
+        /// Draw a dynamic list.
+        /// <param name="rect">The position to draw the variable.</param>
+        /// <param name="dynamicList">The dynamic list to be drawn.</param>
+        /// </summary>
+        static void DrawDynamicList (Rect rect, DynamicList dynamicList) {
+            rect.yMin += 3f;
+            rect.yMax -= 2f;
+            rect.xMin += 6f;
+            rect.xMax -= 6f;
+
+            DrawName(new Rect (rect.x, rect.y, c_LargeNameWidth, rect.height), dynamicList);
+
+            rect.xMin += c_LargeNameWidth + c_Space;
+            rect.xMax -= c_MinusButtonWidth + c_RightPadding;
+            EditorGUI.LabelField(rect, "[" + dynamicList.Count.ToString() + "]");
+
+            rect.x += rect.width + 2f;
+            rect.width = c_MinusButtonWidth;
+            rect.yMin -= 2f;
+            rect.yMax += 2f;
+            if (GUI.Button(rect, s_Styles.iconToolbarMinus, s_Styles.invisbleButton))
+                s_VariableToRemove = dynamicList;
         }
 
         /// <summary> 

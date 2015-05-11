@@ -114,7 +114,7 @@ namespace BehaviourMachineEditor {
     			GUILayout.BeginVertical(); {
     				GUILayout.Space(-12);
     				GUILayout.Label("Behaviour Machine", s_Styles.bigTitle, GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(false));
-    				GUILayout.Label("Version: 1.3.1", GUILayout.ExpandWidth(false));
+    				GUILayout.Label("Version: 1.4.1", GUILayout.ExpandWidth(false));
     			} GUILayout.EndVertical();
     			
     		} GUILayout.EndHorizontal();

@@ -21,7 +21,7 @@ public class BehaviourMachineToolbar {
     [MenuItem("Window/Behaviour")]
     [MenuItem("Tools/BehaviourMachine/Behaviour Window", false, 1001)]
     public static void ShowBehaviourWindow () {
-        EditorWindow.GetWindow<BehaviourMachineMainWindow>("{b} Behaviour");
+        EditorWindow.GetWindow<BehaviourMachineMainWindow>(Print.GetLogo() + " Behaviour");
     }
 
     /// <summary>
@@ -51,17 +51,14 @@ public class BehaviourMachineToolbar {
             // Create GlobalBlackboard
             if (prefab == null) {
                 // The target folder address
-                string folder = string.Empty;
-                // Resource folder exists?
-                if (FileUtility.DirectoryExists("Assets/Plugins/BehaviourMachine/Resources")) {
-                    folder = "Assets/Plugins/BehaviourMachine/Resources";
-                }
-                else if (!FileUtility.DirectoryExists("Assets/Resources")) {
+                string folder = "Assets/Resources";
+
+                // Does Resources folder exist?
+                if (!FileUtility.DirectoryExists(folder)) {
                     AssetDatabase.CreateFolder("Assets", "Resources");
-                    folder = "Assets/Resources";
                 }
 
-                // Create prefab
+                // Create the prefab
                 var go = new GameObject("GlobalBlackboard", typeof(GlobalBlackboard));
                 Selection.activeObject = PrefabUtility.CreatePrefab(folder + "/GlobalBlackboard.prefab", go);
                 GameObject.DestroyImmediate(go);

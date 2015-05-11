@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace BehaviourMachine {
 
-    public enum FieldType {NotSupported, Int, String, Float, Enum, Bool, Vector2, Vector3, Vector4, Quaternion, Rect, Color, LayerMask, AnimationCurve, State, UnityObject, Constant, None, FloatVar, IntVar, BoolVar, StringVar, Vector3Var, RectVar, ColorVar, QuaternionVar, GameObjectVar, TextureVar, MaterialVar, ObjectVar, FsmEvent, Array, Generic}
+    public enum FieldType {NotSupported, Int, String, Float, Enum, Bool, Vector2, Vector3, Vector4, Quaternion, Rect, Color, LayerMask, AnimationCurve, State, UnityObject, Constant, None, FloatVar, IntVar, BoolVar, StringVar, Vector3Var, RectVar, ColorVar, QuaternionVar, GameObjectVar, TextureVar, MaterialVar, ObjectVar, FsmEvent, Array, Generic, DynamicList}
 
     /// <summary>
     /// Custom serialization for nodes.
@@ -27,8 +27,6 @@ namespace BehaviourMachine {
         static Dictionary<Type, FieldInfo[]> s_NodeFields = new Dictionary<Type, FieldInfo[]> ();
         static Dictionary<Type, int> s_NodeHash = new Dictionary<Type, int> ();
         static Dictionary<Type, string> s_StringHash = new Dictionary<Type, string> ();
-        static List<string> s_AssembliesName;
-        static FieldInfo s_TreeField;
         static FieldInfo s_IdField;
 
         public static FieldInfo idField {
@@ -344,6 +342,8 @@ namespace BehaviourMachine {
                             m_FieldType.Add(FieldType.MaterialVar);
                         else if (variableType == typeof(ConcreteObjectVar))
                             m_FieldType.Add(FieldType.ObjectVar);
+                        else if (variableType == typeof(ConcreteDynamicList))
+                            m_FieldType.Add(FieldType.DynamicList);
                         else if (variableType == typeof(ConcreteFsmEvent))
                             m_FieldType.Add(FieldType.FsmEvent);
                     }
@@ -545,8 +545,9 @@ namespace BehaviourMachine {
                 missingNode.missingNodeType = typeName;
                 missingNode.OnTick();
             }
-            else
+            else {
                 node = ActionNode.CreateInstance(type, m_GameObject, m_NodeOwner);
+            }
 
             // Retrieve the parent branch
             var branchIndex = m_BranchIndex[nodeIndex];
@@ -870,6 +871,17 @@ namespace BehaviourMachine {
                         return InternalGlobalBlackboard.Instance.GetObjectVar(varId);
                     else
                         return new ConcreteObjectVar();
+                // DynamicList
+                case FieldType.DynamicList:
+                    // Get variable id
+                    varId = m_IntValue[fieldIndex];
+                    // Get variable
+                    if (varId > 0)
+                        return m_Blackboard.GetDynamicList(varId);
+                    else if (InternalGlobalBlackboard.Instance != null)
+                        return InternalGlobalBlackboard.Instance.GetDynamicList(varId);
+                    else
+                        return new ConcreteDynamicList();
                 // FsmEvent
                 case FieldType.FsmEvent:
                     // Get variable id
