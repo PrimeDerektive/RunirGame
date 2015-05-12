@@ -1,5 +1,6 @@
 ﻿#pragma strict
 
+
 var chargingEffects : ParticleSystem[];
 var chargedEffects : ParticleSystem[];
 var chargedSound : AudioClip;

@@ -3,14 +3,15 @@
 var animLayer : int;
 var swingSound : AudioClip;
 
+var swordBase : Transform;
+var swordTip : Transform;
+
 private var anim : Animator;
 private var audioSource : AudioSource;
 
 function Start () {
 	anim = GetComponent.<Animator>();
 	audioSource = GetComponent.<AudioSource>();
-	yield WaitForSeconds(5.0);
-	anim.SetTrigger("blockKnockback");
 }
 
 private var fireDownTime : float = 0.0;
@@ -48,12 +49,14 @@ function Update () {
 }
 
 function MeleeStart(){
-	BroadcastMessage("StartWeaponTrail");	
+	BroadcastMessage("StartWeaponTrail");
 }
 
 var attackLayers : LayerMask;
+private var attacking : boolean = false;
 	
 function MeleeApex(){
+	/*
 	audioSource.pitch = Random.Range(0.9, 1.0);
 	audioSource.PlayOneShot(swingSound, 1.0);
 	var hit : RaycastHit;
@@ -61,6 +64,7 @@ function MeleeApex(){
 	if(Physics.SphereCast(dir, 5.0, Camera.main.transform.forward, hit, 4.0, attackLayers)){
 		hit.collider.gameObject.SendMessage("TakeDamage", hit);
 	}
+	*/
 }
 
 function MeleeStop(){
