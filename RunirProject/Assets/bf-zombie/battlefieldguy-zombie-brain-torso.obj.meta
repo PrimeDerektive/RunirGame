@@ -1,18 +1,19 @@
 fileFormatVersion: 2
-guid: e3ac2d2dfbcd6444085b7edb6cff9c70
+guid: 4bf8674dde168c545912bcf22974d237
+timeCreated: 1432693368
+licenseType: Free
 ModelImporter:
   serializedVersion: 18
   fileIDToRecycleName:
     100000: //RootNode
-    100002: Sack2
+    100002: default
     400000: //RootNode
-    400002: Sack2
-    2300000: Sack2
-    3300000: Sack2
-    4300000: Sack2
-    9500000: //RootNode
+    400002: default
+    2300000: default
+    3300000: default
+    4300000: default
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 0
     materialSearch: 1
   animations:
@@ -44,11 +45,11 @@ ModelImporter:
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
-    useFileScale: 0
+    useFileScale: 1
   tangentSpace:
-    normalSmoothAngle: 60
+    normalSmoothAngle: 180
     splitTangentsAcrossUV: 1
-    normalImportMode: 0
+    normalImportMode: 1
     tangentImportMode: 1
   importAnimation: 1
   copyAvatar: 0
@@ -64,7 +65,7 @@ ModelImporter:
     feetSpacing: 0
     rootMotionBoneName: 
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 0
   additionalBone: 0
   userData: 
   assetBundleName: 
